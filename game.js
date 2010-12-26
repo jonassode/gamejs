@@ -21,11 +21,14 @@ function _layer_class( s ){
 
 function _node_class( attributes ){
     this.layer = parent;
-    this.x = 10;
-    this.y = 10;
-    this.width = 10;
-    this.height = 10;
+    if (attributes.x != null ) { this.x = attributes.x; } else { this.x = 0; }
+    if (attributes.y != null ) { this.y = attributes.y; } else { this.y = 0; }
+    if (attributes.width != null ) { this.width = attributes.width; } else { this.width = 10; }
+    if (attributes.height != null ) { this.height = attributes.height; } else { this.height = 10; }
+    if (attributes.color != null ) { this.color = attributes.color; } else { this.color = '#000'; }
+
     this.draw = function (){
+        this.layer.scene.context.fillStyle = this.color;
         this.layer.scene.context.fillRect(this.x, this.y, this.width, this.height);
     };
 }
@@ -57,7 +60,7 @@ function _layer( s ){
 
 // _node
 function _node( attributes ){
-    var n = new _node_class();
+    var n = new _node_class( attributes );
     _default_scene._default_layer.add_node(n);
 }
 
