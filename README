@@ -1,0 +1,11 @@
+About game.js
+game.js is a html5 gaming library 
+There is no documentation other than the code, this file and index.html
+Check out index.html for an example of usage
+
+Current Version
+0.001
+
+History
+0.001: nodes have attributes x, y, width, height, color
+
