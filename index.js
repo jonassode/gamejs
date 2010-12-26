@@ -7,6 +7,7 @@ var Index = {
 // Init
 window.onload = function () {
     Index.scene = _scene("exampel_canvas");
+    _node({img:'background.png'});
     _node({x:20,color:'silver',width:10,height:10});
     _node({color:'pink',width:10,height:10});
     _node({y:40,width:5,height:20,x:20});
