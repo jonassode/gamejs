@@ -4,8 +4,9 @@ There is no documentation other than the code, this file and index.html
 Check out index.html for an example of usage
 
 Current Version
-0.001
+0.002
 
 History
 0.001: nodes have attributes x, y, width, height, color
+0.002: It is not possible to have images as nodes
 

@@ -21,15 +21,31 @@ function _layer_class( s ){
 
 function _node_class( attributes ){
     this.layer = parent;
+    if (attributes.img != null) {
+        this.type = 'image';
+        this.image = new Image();
+        this.image.src = attributes.img;
+    } else {
+        this.type = 'block';
+    }
+
     if (attributes.x != null ) { this.x = attributes.x; } else { this.x = 0; }
     if (attributes.y != null ) { this.y = attributes.y; } else { this.y = 0; }
-    if (attributes.width != null ) { this.width = attributes.width; } else { this.width = 10; }
-    if (attributes.height != null ) { this.height = attributes.height; } else { this.height = 10; }
+    if (attributes.width != null ) { this.width = attributes.width; } else { this.width = null; }
+    if (attributes.height != null ) { this.height = attributes.height; } else { this.height = null; }
     if (attributes.color != null ) { this.color = attributes.color; } else { this.color = '#000'; }
 
     this.draw = function (){
-        this.layer.scene.context.fillStyle = this.color;
-        this.layer.scene.context.fillRect(this.x, this.y, this.width, this.height);
+        if (this.type == 'block') {
+            this.layer.scene.context.fillStyle = this.color;
+            this.layer.scene.context.fillRect(this.x, this.y, this.width, this.height);
+        } else if(this.type == 'image') {
+            if (this.height != null && this.width != null) {
+                this.layer.scene.context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            } else {
+                this.layer.scene.context.drawImage(this.image, this.x, this.y);
+            }
+        }
     };
 }
 
@@ -44,7 +60,7 @@ function _scene_class( scene_name ){
 
     this.draw = function (){
         for (var li = 0; li < this.layers.length; li++) {
-            if (this.layers[li].visible === true) {
+            if (this.layers[li].visible == true) {
                 this.layers[li].draw();
             }
         }
