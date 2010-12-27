@@ -1,8 +1,10 @@
 // Constants
 var _default_scene = null;
+var _id_list = new Array();
 
 // Classes
 function _layer_class( s ){
+    this.id = _generate_id("l");
     this.scene = s;
     this.name = "Default";
     this.visible = true;
@@ -20,6 +22,7 @@ function _layer_class( s ){
 }
 
 function _node_class( attributes ){
+    this.id = _generate_id("n");
     this.layer = parent;
     if (attributes.img != null) {
         this.type = 'image';
@@ -50,6 +53,7 @@ function _node_class( attributes ){
 }
 
 function _scene_class( scene_name ){
+    this.id = _generate_id("s");
     this.name = "Scene"
     this.layers = new Array();
     this.layers[0] = _layer(this);
@@ -90,4 +94,16 @@ function _scene( scene_name ){
 // Search Functions
 function _( search_criteria ){
     // Returns What Ever The Searc Criteria Found
+}
+
+function _generate_id(type){
+    var new_id = type + _id_list.length;
+    _id_list[_id_list.length] = new_id;
+    return new_id;
+}
+
+
+// Utils
+function random(roof){
+    return Math.floor(Math.random()*roof);
 }
