@@ -3,11 +3,17 @@ game.js is a html5 gaming library
 There is no documentation other than the code, this file and index.html
 Check out index.html for an example of usage
 
+Objects
+scene
+layer
+node
+
 Current Version
-0.003
+0.004
 
 History
 0.001: nodes have attributes x, y, width, height, color
 0.002: It is not possible to have images as nodes
 0.003: Added background image as example
+0.004: All objects (scenes, layers, nodes) now have unique id's
 
