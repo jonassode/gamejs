@@ -9,7 +9,7 @@ layer
 node
 
 Current Version
-0.005
+0.006
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -20,4 +20,8 @@ History
 	Search method for _layers()
 	Possibility to toggle layers off and on
 	Index.html updated with example that toogles default layer on/off
- 
+0.006:	No layer is created by default when creating a scene
+	Layers are now created on the scene object
+	Fixed bug in layer search
+	Layer name is set when it is created
+	Index.html exampel is updated with two layers that you can turn on/off

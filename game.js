@@ -4,11 +4,10 @@ var _id_list = new Array();
 var _id_hash = {}
 
 // Classes
-function _layer_class( s ){
+function _layer_class( layer_name ){
     this.id = _generate_id("l");
     _id_hash[this.id] = this
-    this.scene = s;
-    this.name = "Default";
+    this.name = layer_name;
     this.visible = true;
     this.nodes = new Array();
     // Draws all nodes in the layer on Canvas
@@ -70,12 +69,20 @@ function _scene_class( scene_name ){
     _id_hash[this.id] = this
     this.name = "Scene"
     this.layers = new Array();
-    this.layers[0] = _layer(this);
-    this._default_layer = this.layers[0];
 
     this.canvas = document.getElementById(scene_name);
     this.context = this.canvas.getContext("2d");
 
+    // Builds a Layer
+    this._layer = function( layer_name ){
+        var l = new _layer_class( layer_name );
+        this.layers[this.layers.length] = l;
+        this._default_layer = l;
+        l.scene = this;
+        return l
+    }
+
+    // Draws all the visible layers of the scene
     this.draw = function (){
         this.context.clearRect ( 0 , 0 , this.canvas.width , this.canvas.height );
         for (var li = 0; li < this.layers.length; li++) {
@@ -88,10 +95,10 @@ function _scene_class( scene_name ){
 
 // Builders
 // _layer
-function _layer( s ){
-    var l = new _layer_class( s );
-    return l;
-}
+//function _layer( s ){
+//    var l = new _layer_class( s );
+//    return l;
+//}
 
 // _node
 function _node( attributes ){
@@ -114,7 +121,7 @@ function _( search_criteria ){
 function _layers( layer_name ){
     for (var i = 0; i < _id_list.length; i++) {
         if ( _id_list[i].substr(0,1) == "l") {
-            if ( _id_hash[_id_list[i]].name = layer_name ) {
+            if ( _id_hash[_id_list[i]].name == layer_name ) {
                 return _id_hash[_id_list[i]];
             }
         }
