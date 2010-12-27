@@ -1,7 +1,8 @@
 
 // Namespace
 var Index = {
-    scene: null
+    scene: null,
+    scene2: null
 };
 
 // Init
@@ -22,7 +23,11 @@ window.onload = function () {
     _node({x:100,y:50,img:'logo.gif'});
     _node({x:100,y:100,img:'logo.gif',width:30,height:30});
 
-    Index.scene.draw();
+    Index.scene2 = _scene("exampel_canvas");
+    Index.scene2._layer("menu");
+    _node({img:'menu.png'});
+
+    Index.scene2.draw();
 };
 
 // Custom Event Handlers

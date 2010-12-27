@@ -9,7 +9,7 @@ layer
 node
 
 Current Version
-0.006
+0.007
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -25,3 +25,6 @@ History
 	Fixed bug in layer search
 	Layer name is set when it is created
 	Index.html exampel is updated with two layers that you can turn on/off
+0.007:	All methods in the class now return reference to self or newly created object
+	Clean Up of defunct functions
+	Updated exampels with Scenes that you can switch between
