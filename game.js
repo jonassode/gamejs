@@ -36,6 +36,12 @@ function _layer_class( layer_name ){
         }
         return this;
     }
+
+    this.node = function ( attributes ){
+        var n = new _node_class( attributes );
+        this.add_node(n);
+        return n;
+    }
 }
 
 function _node_class( attributes ){
@@ -106,13 +112,6 @@ function _scene_class( scene_name ){
 }
 
 // Builders
-
-// _node
-function _node( attributes ){
-    var n = new _node_class( attributes );
-    _default_scene._default_layer.add_node(n);
-    return n;
-}
 
 // _scene
 function _scene( scene_name ){
