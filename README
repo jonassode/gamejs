@@ -12,12 +12,11 @@ Current Version
 0.005
 
 History
-0.001: nodes have attributes x, y, width, height, color
-0.002: It is not possible to have images as nodes
-0.003: Added background image as example
-0.004: All objects (scenes, layers, nodes) now have unique id's
-0.005: 
-	References to all objects are stored in _id_hash
+0.001:	Nodes have attributes x, y, width, height, color
+0.002:	It is not possible to have images as nodes
+0.003:	Added background image as example
+0.004:	All objects (scenes, layers, nodes) now have unique id's
+0.005:	References to all objects are stored in _id_hash
 	Search method for _layers()
 	Possibility to toggle layers off and on
 	Index.html updated with example that toogles default layer on/off
