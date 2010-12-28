@@ -9,7 +9,7 @@ layer
 node
 
 Current Version
-0.008
+0.009
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -29,3 +29,8 @@ History
 	Clean Up of defunct functions
 	Updated exampels with Scenes that you can switch between
 0.008:	_node has been moved to the layer class and renamed node
+0.009:	Added offset attributes to scene
+	Scene now requires attributes hash when created
+	Fixed typo in Scene class
+	Nodes are now drawn based on the offset attributes in their scene
+

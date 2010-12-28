@@ -5,11 +5,16 @@ var _id_hash = {}
 
 // Classes
 function _layer_class( layer_name ){
+    // Attributes
     this.id = _generate_id("l");
-    _id_hash[this.id] = this
     this.name = layer_name;
     this.visible = true;
     this.nodes = new Array();
+
+    // Add Layer to Id Hahs
+    _id_hash[this.id] = this
+
+    // Functions
     // Draws all nodes in the layer on Canvas
     // Returns self-reference
     this.draw = function (){
@@ -19,6 +24,7 @@ function _layer_class( layer_name ){
         }
         return this;
     };
+
     // Adds specified node to layer
     // Returns reference to new node
     this.add_node = function(n){
@@ -26,6 +32,7 @@ function _layer_class( layer_name ){
         this.nodes[this.nodes.length] = n;
         return n;
     };
+
     // Toggles Visibility
     // Returns self-reference
     this.toggle = function(){
@@ -35,13 +42,14 @@ function _layer_class( layer_name ){
             this.visible = true;
         }
         return this;
-    }
+    };
 
+    // Create a node
     this.node = function ( attributes ){
         var n = new _node_class( attributes );
         this.add_node(n);
         return n;
-    }
+    };
 }
 
 function _node_class( attributes ){
@@ -67,26 +75,30 @@ function _node_class( attributes ){
     this.draw = function (){
         if (this.type == 'block') {
             this.layer.scene.context.fillStyle = this.color;
-            this.layer.scene.context.fillRect(this.x, this.y, this.width, this.height);
+            this.layer.scene.context.fillRect(this.x + this.layer.scene.offsetx, this.y + this.layer.scene.offsety, this.width, this.height);
         } else if(this.type == 'image') {
             if (this.height != null && this.width != null) {
-                this.layer.scene.context.drawImage(this.image, this.x, this.y, this.width, this.height);
+                this.layer.scene.context.drawImage(this.image, this.x + this.layer.scene.offsetx, this.y + this.layer.scene.offsety, this.width, this.height);
             } else {
-                this.layer.scene.context.drawImage(this.image, this.x, this.y);
+                this.layer.scene.context.drawImage(this.image, this.x + this.layer.scene.offsetx, this.y + this.layer.scene.offsety);
             }
         }
         return this;
     };
 }
 
-function _scene_class( scene_name ){
+function _scene_class( canvas_name, attributes ){
+    // Attributes
     this.id = _generate_id("s");
-    _id_hash[this.id] = this
-    this.name = "Scene"
+    this.name = "Scene";
     this.layers = new Array();
-
-    this.canvas = document.getElementById(scene_name);
+    this.canvas = document.getElementById( canvas_name );
     this.context = this.canvas.getContext("2d");
+    if (attributes.offsetx != null ) { this.offsetx = attributes.offsetx; } else { this.offsetx = 0; }
+    if (attributes.offsety != null ) { this.offsety = attributes.offsety; } else { this.offsety = 0; }
+
+    // Add Scene to Object Hash
+    _id_hash[this.id] = this
 
     // Builds a Layer
     // Returns reference to new layer
@@ -112,10 +124,9 @@ function _scene_class( scene_name ){
 }
 
 // Builders
-
 // _scene
-function _scene( scene_name ){
-    var s = new _scene_class( scene_name )
+function _scene( scene_name, attributes ){
+    var s = new _scene_class( scene_name, attributes )
     _default_scene = s;
     return s;
 }
