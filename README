@@ -8,8 +8,11 @@ scene
 layer
 node
 
+Dependencies
+-jQuery
+
 Current Version
-0.009
+0.010
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
