@@ -33,4 +33,4 @@ History
 	Scene now requires attributes hash when created
 	Fixed typo in Scene class
 	Nodes are now drawn based on the offset attributes in their scene
-
+0.010:	Added warning if jQuery is not loaded.

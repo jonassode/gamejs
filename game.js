@@ -1,3 +1,8 @@
+// Dependencies
+if (typeof jQuery == 'undefined') { 
+    alert('Warning!\njQuery is not loaded.\nAs of version 0.010 game.js requires jQuery\nPlease add a call to jQuery in your website and reload page.');
+}
+
 // Constants
 var _default_scene = null;
 var _id_list = new Array();
