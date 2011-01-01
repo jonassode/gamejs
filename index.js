@@ -7,7 +7,16 @@ var Index = {
 
 // Init
 window.onload = function () {
+    // Create Scenes
     Index.scene = _scene("exampel_canvas", {});
+    Index.scene2 = _scene("exampel_canvas", {});
+
+    // Register Events
+    Index.scene.keypress('a', function(){ alert('Yes'); });
+    Index.scene.keypress('b', function(){ alert('Maybe'); });
+    Index.scene2.keypress('a', function(){ alert('No'); });
+
+    // Create Layers and Objects
     var lb = Index.scene._layer("background");
     lb.node({img:'background.png'});
 
@@ -23,11 +32,9 @@ window.onload = function () {
     lbox.node({x:100,y:50,img:'logo.gif'});
     lbox.node({x:100,y:100,img:'logo.gif',width:30,height:30});
 
-    Index.scene2 = _scene("exampel_canvas", {});
     lmenu = Index.scene2._layer("menu");
     lmenu.node({img:'menu.png'});
 
     Index.scene2.draw();
 };
 
-// Custom Event Handlers

@@ -4,7 +4,7 @@ if (typeof jQuery == 'undefined') {
 }
 
 // Constants
-var _default_scene = null;
+var _visible_scene = null;
 var _id_list = new Array();
 var _id_hash = {}
 
@@ -99,6 +99,7 @@ function _scene_class( canvas_name, attributes ){
     this.layers = new Array();
     this.canvas = document.getElementById( canvas_name );
     this.context = this.canvas.getContext("2d");
+    this.keypresses = {};
     if (attributes.offsetx != null ) { this.offsetx = attributes.offsetx; } else { this.offsetx = 0; }
     if (attributes.offsety != null ) { this.offsety = attributes.offsety; } else { this.offsety = 0; }
 
@@ -124,15 +125,21 @@ function _scene_class( canvas_name, attributes ){
                 this.layers[li].draw();
             }
         }
+        _visible_scene = this;
         return this;
     };
+
+    this.keypress = function(char, func){
+        var charUpperCase = char.toUpperCase()
+        this.keypresses[charUpperCase] = func;
+    };
+
 }
 
 // Builders
 // _scene
 function _scene( scene_name, attributes ){
     var s = new _scene_class( scene_name, attributes )
-    _default_scene = s;
     return s;
 }
 
@@ -157,3 +164,10 @@ function _generate_id(type){
     _id_list[_id_list.length] = new_id;
     return new_id;
 }
+
+$(document).keyup(function(event){
+    var method = String.fromCharCode(event.which);
+    if ( _visible_scene.keypresses[method] != null ) {
+        _visible_scene.keypresses[method]();
+    }
+});
