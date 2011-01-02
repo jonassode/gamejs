@@ -4,7 +4,7 @@ if (typeof jQuery == 'undefined') {
 }
 
 // Constants
-var _visible_scene = null;
+var _visible_screen = null;
 var _id_list = new Array();
 var _id_hash = {}
 
@@ -79,23 +79,23 @@ function _node_class( attributes ){
     // Returns self-reference
     this.draw = function (){
         if (this.type == 'block') {
-            this.layer.scene.context.fillStyle = this.color;
-            this.layer.scene.context.fillRect(this.x + this.layer.scene.offsetx, this.y + this.layer.scene.offsety, this.width, this.height);
+            this.layer.screen.context.fillStyle = this.color;
+            this.layer.screen.context.fillRect(this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
         } else if(this.type == 'image') {
             if (this.height != null && this.width != null) {
-                this.layer.scene.context.drawImage(this.image, this.x + this.layer.scene.offsetx, this.y + this.layer.scene.offsety, this.width, this.height);
+                this.layer.screen.context.drawImage(this.image, this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
             } else {
-                this.layer.scene.context.drawImage(this.image, this.x + this.layer.scene.offsetx, this.y + this.layer.scene.offsety);
+                this.layer.screen.context.drawImage(this.image, this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety);
             }
         }
         return this;
     };
 }
 
-function _scene_class( canvas_name, attributes ){
+function _screen_class( canvas_name, attributes ){
     // Attributes
     this.id = _generate_id("s");
-    this.name = "Scene";
+    this.name = "Screen";
     this.layers = new Array();
     this.canvas = document.getElementById( canvas_name );
     this.context = this.canvas.getContext("2d");
@@ -103,7 +103,7 @@ function _scene_class( canvas_name, attributes ){
     if (attributes.offsetx != null ) { this.offsetx = attributes.offsetx; } else { this.offsetx = 0; }
     if (attributes.offsety != null ) { this.offsety = attributes.offsety; } else { this.offsety = 0; }
 
-    // Add Scene to Object Hash
+    // Add screen to Object Hash
     _id_hash[this.id] = this
 
     // Builds a Layer
@@ -112,11 +112,11 @@ function _scene_class( canvas_name, attributes ){
         var l = new _layer_class( layer_name );
         this.layers[this.layers.length] = l;
         this._default_layer = l;
-        l.scene = this;
+        l.screen = this;
         return l
     }
 
-    // Draws all the visible layers of the scene
+    // Draws all the visible layers of the screen
     // Returns self-reference
     this.draw = function (){
         this.context.clearRect ( 0 , 0 , this.canvas.width , this.canvas.height );
@@ -125,7 +125,7 @@ function _scene_class( canvas_name, attributes ){
                 this.layers[li].draw();
             }
         }
-        _visible_scene = this;
+        _visible_screen = this;
         return this;
     };
 
@@ -137,9 +137,9 @@ function _scene_class( canvas_name, attributes ){
 }
 
 // Builders
-// _scene
-function _scene( scene_name, attributes ){
-    var s = new _scene_class( scene_name, attributes )
+// _screen
+function _screen( screen_name, attributes ){
+    var s = new _screen_class( screen_name, attributes )
     return s;
 }
 
@@ -167,7 +167,7 @@ function _generate_id(type){
 
 $(document).keyup(function(event){
     var method = String.fromCharCode(event.which);
-    if ( _visible_scene.keypresses[method] != null ) {
-        _visible_scene.keypresses[method]();
+    if ( _visible_screen.keypresses[method] != null ) {
+        _visible_screen.keypresses[method]();
     }
 });
