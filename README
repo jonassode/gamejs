@@ -12,7 +12,7 @@ Dependencies
 -jQuery
 
 Current Version
-0.011
+0.013
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -39,4 +39,5 @@ History
 0.010:	Added warning if jQuery is not loaded.
 0.011:	It is now possible to register keypresses on Scenes using scene.keypress(char, function)
 0.012:	Renamed Scene -> Screen
+0.013:	Changed name of screen._layer() -> screen.layer()
 

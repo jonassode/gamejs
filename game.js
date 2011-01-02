@@ -108,7 +108,7 @@ function _screen_class( canvas_name, attributes ){
 
     // Builds a Layer
     // Returns reference to new layer
-    this._layer = function( layer_name ){
+    this.layer = function( layer_name ){
         var l = new _layer_class( layer_name );
         this.layers[this.layers.length] = l;
         this._default_layer = l;
