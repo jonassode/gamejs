@@ -6,7 +6,12 @@ if (typeof jQuery == 'undefined') {
 // Constants
 var _visible_screen = null;
 var _id_list = new Array();
-var _id_hash = {}
+var _id_hash = {};
+// Movement
+var _up = {row:-1, col:0};
+var _down = {row:1, col:0};
+var _left = {row:0, col:-1};
+var _right = {row:0, col:1};
 
 // Classes
 function _layer_class( layer_name ){
@@ -15,6 +20,7 @@ function _layer_class( layer_name ){
     this.name = layer_name;
     this.visible = true;
     this.nodes = new Array();
+    this.tilemaps = new Array();
 
     // Add Layer to Id Hahs
     _id_hash[this.id] = this
@@ -25,17 +31,11 @@ function _layer_class( layer_name ){
     this.draw = function (){
         for (var ni = 0; ni < this.nodes.length; ni++) {
           this.nodes[ni].draw();
-
+        }
+        for (var tmi = 0; tmi < this.tilemaps.length; tmi++) {
+          this.tilemaps[tmi].draw();
         }
         return this;
-    };
-
-    // Adds specified node to layer
-    // Returns reference to new node
-    this.add_node = function(n){
-        n.layer = this;
-        this.nodes[this.nodes.length] = n;
-        return n;
     };
 
     // Toggles Visibility
@@ -55,12 +55,28 @@ function _layer_class( layer_name ){
         this.add_node(n);
         return n;
     };
+
+    // Adds specified node to layer
+    // Returns reference to new node
+    this.add_node = function(n){
+        n.layer = this;
+        this.nodes[this.nodes.length] = n;
+        return n;
+    };
+
+    // Create a tilemap
+    this.tilemap = function ( attributes ){
+        var tm = new _tilemap_class( attributes );
+        tm.layer = this;
+        this.tilemaps[this.tilemaps.length] = tm;
+        return tm;
+    };
+
 }
 
 function _node_class( attributes ){
     this.id = _generate_id("n");
     _id_hash[this.id] = this
-    this.layer = parent;
     if (attributes.img != null) {
         this.type = 'image';
         this.image = new Image();
@@ -90,6 +106,18 @@ function _node_class( attributes ){
         }
         return this;
     };
+
+    // Movement
+    this.move = function(direction){
+        var row = this.row;
+        var col = this.col;
+        this.row = row + direction.row;
+        this.col = col + direction.col;
+
+        this.tilemap.tiles[this.row][this.col] = this;
+        this.tilemap.tiles[row][col] = null;
+        this.layer.screen.draw();
+    }
 }
 
 function _screen_class( canvas_name, attributes ){
@@ -135,6 +163,57 @@ function _screen_class( canvas_name, attributes ){
     };
 
 }
+
+function _tilemap_class( attributes ){
+    this.id = _generate_id("tm");
+    _id_hash[this.id] = this
+    if (attributes.cols != null ) { this.cols = attributes.cols; }
+    if (attributes.rows != null ) { this.rows = attributes.rows; }
+    if (attributes.tilesize != null ) { this.tilesize = attributes.tilesize; }
+
+    // Creating Tiles Array
+    this.tiles = new Array(this.rows);
+    for (var row = 0; row < this.rows; row++) {
+        this.tiles[row] = new Array(this.cols);
+    }
+
+    this.tile = function(row, col, attributes ){
+        var tile = new _node_class( attributes );
+        tile.layer = this.layer;
+        tile.row = row;
+        tile.col = col;
+        tile.tilemap = this;
+        this.tiles[row][col] = tile;
+        return tile;
+    }
+
+    this.draw = function(){
+    for (var row = 0; row < this.rows; row++) {
+        for (var col = 0; col < this.cols; col++) {
+                var tile = this.tiles[row][col]
+                if ( tile != null){
+                    tile.x = (col * this.tilesize);
+                    tile.y = (row * this.tilesize);
+                    tile.width = this.tilesize;
+                    tile.height = this.tilesize;
+                    tile.draw();
+                }
+            }
+        }
+        return this;
+    }
+
+    this.fill = function(attributes){
+        for (var row = 0; row < this.rows; row++) {
+            for (var col = 0; col < this.cols; col++) {
+                this.tile(row,col, attributes);
+            }
+        }
+    }
+
+}
+
+
 
 // Builders
 // _screen
