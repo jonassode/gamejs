@@ -13,7 +13,7 @@ Dependencies
 -jQuery
 
 Current Version
-0.016
+0.017
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -44,3 +44,6 @@ History
 0.014:	Added tilemap
 0.015:	Tilemap can now be placed any where on the map using the x, y attributes
 0.016:  It is now not possible for a tile to move outside of the tilemap
+0.017:	Tilemap now has backgrounds for each tile position
+	Map follows you around if map is larger than visible map
+

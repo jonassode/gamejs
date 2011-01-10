@@ -153,6 +153,21 @@ function _node_class( attributes ){
 
             this.tilemap.tiles[this.row][this.col] = this;
             this.tilemap.tiles[row][col] = null;
+            //
+            var newtilemaprow = this.tilemap.row + direction.row;
+            var newtilemapcol = this.tilemap.col + direction.col;
+            var centerrow = Math.round(this.tilemap.visiblerows/2);
+            var centercol = Math.round(this.tilemap.visiblecols/2);
+            var tilepositionrow = (row-this.tilemap.row+1);
+            var tilepositioncol = (col-this.tilemap.col+1);
+
+            if (!(newtilemaprow < 0) && !(newtilemaprow > (this.tilemap.rows-this.tilemap.visiblecols)) && ( tilepositionrow == centerrow) ){
+                this.tilemap.row = newtilemaprow;
+            }
+            if (!(newtilemapcol < 0) && !(newtilemapcol > (this.tilemap.cols-this.tilemap.visiblecols)) && ( tilepositioncol == centercol) ){
+                this.tilemap.col = newtilemapcol;
+            }
+
             this.layer.screen.draw();
         }
     }
@@ -219,6 +234,29 @@ function _tilemap_class( attributes ){
     if (attributes.rows != null ) {
         this.rows = attributes.rows;
     }
+    if (attributes.visiblecols != null ) {
+        this.visiblecols = attributes.visiblecols;
+    } else {
+        this.visiblecols = this.cols;
+    }
+    if (attributes.visiblerows != null ) {
+        this.visiblerows = attributes.visiblerows;
+    } else {
+        this.visiblerows = this.rows;
+    }
+    if (attributes.col != null ) {
+        this.col = attributes.col;
+    } else {
+        this.col = 0;
+    }
+    if (attributes.row != null ) {
+        this.row = attributes.row;
+    } else {
+        this.row = 0;
+    }
+    if (attributes.rows != null ) {
+        this.rows = attributes.rows;
+    }
     if (attributes.tilesize != null ) {
         this.tilesize = attributes.tilesize;
     }
@@ -238,6 +276,10 @@ function _tilemap_class( attributes ){
     for (var row = 0; row < this.rows; row++) {
         this.tiles[row] = new Array(this.cols);
     }
+    this.backgrounds = new Array(this.rows);
+    for (var row = 0; row < this.rows; row++) {
+        this.backgrounds[row] = new Array(this.cols);
+    }
 
     this.tile = function(row, col, attributes ){
         var tile = new _node_class( attributes );
@@ -248,17 +290,33 @@ function _tilemap_class( attributes ){
         this.tiles[row][col] = tile;
         return tile;
     }
+    this.background = function(row, col, attributes ){
+        var background = new _node_class( attributes );
+        background.layer = this.layer;
+        background.row = row;
+        background.col = col;
+        background.tilemap = this;
+        this.backgrounds[row][col] = background;
+        return background;
+    }
 
     this.draw = function(){
-        for (var row = 0; row < this.rows; row++) {
-            for (var col = 0; col < this.cols; col++) {
+        for (var row = this.row; row < (this.visiblerows+this.row); row++) {
+            for (var col = this.col; col < (this.visiblecols+this.col); col++) {
                 var tile = this.tiles[row][col]
                 if ( tile != null){
-                    tile.x = (col * this.tilesize) + this.x;
-                    tile.y = (row * this.tilesize) + this.y;
+                    tile.x = ((col-this.col) * this.tilesize) + this.x;
+                    tile.y = ((row-this.row) * this.tilesize) + this.y;
                     tile.width = this.tilesize;
                     tile.height = this.tilesize;
                     tile.draw();
+                } else {
+                    var bg = this.backgrounds[row][col]
+                    bg.x = ((col-this.col) * this.tilesize) + this.x;
+                    bg.y = ((row-this.row) * this.tilesize) + this.y;
+                    bg.width = this.tilesize;
+                    bg.height = this.tilesize;
+                    bg.draw();
                 }
             }
         }
@@ -268,7 +326,7 @@ function _tilemap_class( attributes ){
     this.fill = function(attributes){
         for (var row = 0; row < this.rows; row++) {
             for (var col = 0; col < this.cols; col++) {
-                this.tile(row, col, attributes);
+                this.background(row, col, attributes);
             }
         }
     }
@@ -286,7 +344,7 @@ function _screen( screen_name, attributes ){
 
 // Search Functions
 function _( search_criteria ){
-    // Returns What Ever The Searc Criteria Found
+// Returns What Ever The Searc Criteria Found
 }
 
 function _layers( layer_name ){
