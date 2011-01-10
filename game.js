@@ -8,10 +8,22 @@ var _visible_screen = null;
 var _id_list = new Array();
 var _id_hash = {};
 // Movement
-var _up = {row:-1, col:0};
-var _down = {row:1, col:0};
-var _left = {row:0, col:-1};
-var _right = {row:0, col:1};
+var _up = {
+    row:-1,
+    col:0
+};
+var _down = {
+    row:1,
+    col:0
+};
+var _left = {
+    row:0,
+    col:-1
+};
+var _right = {
+    row:0,
+    col:1
+};
 
 // Classes
 function _layer_class( layer_name ){
@@ -30,10 +42,10 @@ function _layer_class( layer_name ){
     // Returns self-reference
     this.draw = function (){
         for (var ni = 0; ni < this.nodes.length; ni++) {
-          this.nodes[ni].draw();
+            this.nodes[ni].draw();
         }
         for (var tmi = 0; tmi < this.tilemaps.length; tmi++) {
-          this.tilemaps[tmi].draw();
+            this.tilemaps[tmi].draw();
         }
         return this;
     };
@@ -85,11 +97,31 @@ function _node_class( attributes ){
         this.type = 'block';
     }
 
-    if (attributes.x != null ) { this.x = attributes.x; } else { this.x = 0; }
-    if (attributes.y != null ) { this.y = attributes.y; } else { this.y = 0; }
-    if (attributes.width != null ) { this.width = attributes.width; } else { this.width = null; }
-    if (attributes.height != null ) { this.height = attributes.height; } else { this.height = null; }
-    if (attributes.color != null ) { this.color = attributes.color; } else { this.color = '#000'; }
+    if (attributes.x != null ) {
+        this.x = attributes.x;
+    } else {
+        this.x = 0;
+    }
+    if (attributes.y != null ) {
+        this.y = attributes.y;
+    } else {
+        this.y = 0;
+    }
+    if (attributes.width != null ) {
+        this.width = attributes.width;
+    } else {
+        this.width = null;
+    }
+    if (attributes.height != null ) {
+        this.height = attributes.height;
+    } else {
+        this.height = null;
+    }
+    if (attributes.color != null ) {
+        this.color = attributes.color;
+    } else {
+        this.color = '#000';
+    }
 
     // Draws the node on canvas
     // Returns self-reference
@@ -128,8 +160,16 @@ function _screen_class( canvas_name, attributes ){
     this.canvas = document.getElementById( canvas_name );
     this.context = this.canvas.getContext("2d");
     this.keypresses = {};
-    if (attributes.offsetx != null ) { this.offsetx = attributes.offsetx; } else { this.offsetx = 0; }
-    if (attributes.offsety != null ) { this.offsety = attributes.offsety; } else { this.offsety = 0; }
+    if (attributes.offsetx != null ) {
+        this.offsetx = attributes.offsetx;
+    } else {
+        this.offsetx = 0;
+    }
+    if (attributes.offsety != null ) {
+        this.offsety = attributes.offsety;
+    } else {
+        this.offsety = 0;
+    }
 
     // Add screen to Object Hash
     _id_hash[this.id] = this
@@ -157,8 +197,8 @@ function _screen_class( canvas_name, attributes ){
         return this;
     };
 
-    this.keypress = function(char, func){
-        var charUpperCase = char.toUpperCase()
+    this.keypress = function(character, func){
+        var charUpperCase = character.toUpperCase()
         this.keypresses[charUpperCase] = func;
     };
 
@@ -167,9 +207,25 @@ function _screen_class( canvas_name, attributes ){
 function _tilemap_class( attributes ){
     this.id = _generate_id("tm");
     _id_hash[this.id] = this
-    if (attributes.cols != null ) { this.cols = attributes.cols; }
-    if (attributes.rows != null ) { this.rows = attributes.rows; }
-    if (attributes.tilesize != null ) { this.tilesize = attributes.tilesize; }
+    if (attributes.cols != null ) {
+        this.cols = attributes.cols;
+    }
+    if (attributes.rows != null ) {
+        this.rows = attributes.rows;
+    }
+    if (attributes.tilesize != null ) {
+        this.tilesize = attributes.tilesize;
+    }
+    if (attributes.x != null ) {
+        this.x = attributes.x;
+    } else {
+        this.x = 0;
+    }
+    if (attributes.y != null ) {
+        this.y = attributes.y;
+    } else {
+        this.y = 0;
+    }
 
     // Creating Tiles Array
     this.tiles = new Array(this.rows);
@@ -188,12 +244,12 @@ function _tilemap_class( attributes ){
     }
 
     this.draw = function(){
-    for (var row = 0; row < this.rows; row++) {
-        for (var col = 0; col < this.cols; col++) {
+        for (var row = 0; row < this.rows; row++) {
+            for (var col = 0; col < this.cols; col++) {
                 var tile = this.tiles[row][col]
                 if ( tile != null){
-                    tile.x = (col * this.tilesize);
-                    tile.y = (row * this.tilesize);
+                    tile.x = (col * this.tilesize) + this.x;
+                    tile.y = (row * this.tilesize) + this.y;
                     tile.width = this.tilesize;
                     tile.height = this.tilesize;
                     tile.draw();
@@ -206,7 +262,7 @@ function _tilemap_class( attributes ){
     this.fill = function(attributes){
         for (var row = 0; row < this.rows; row++) {
             for (var col = 0; col < this.cols; col++) {
-                this.tile(row,col, attributes);
+                this.tile(row, col, attributes);
             }
         }
     }
@@ -224,7 +280,7 @@ function _screen( screen_name, attributes ){
 
 // Search Functions
 function _( search_criteria ){
-    // Returns What Ever The Searc Criteria Found
+// Returns What Ever The Searc Criteria Found
 }
 
 function _layers( layer_name ){
