@@ -143,12 +143,18 @@ function _node_class( attributes ){
     this.move = function(direction){
         var row = this.row;
         var col = this.col;
-        this.row = row + direction.row;
-        this.col = col + direction.col;
+        // Calculate New Direction
+        var newrow = row + direction.row;
+        var newcol = col + direction.col;
 
-        this.tilemap.tiles[this.row][this.col] = this;
-        this.tilemap.tiles[row][col] = null;
-        this.layer.screen.draw();
+        if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols)) {
+            this.row = newrow;
+            this.col = newcol;
+
+            this.tilemap.tiles[this.row][this.col] = this;
+            this.tilemap.tiles[row][col] = null;
+            this.layer.screen.draw();
+        }
     }
 }
 
@@ -280,7 +286,7 @@ function _screen( screen_name, attributes ){
 
 // Search Functions
 function _( search_criteria ){
-// Returns What Ever The Searc Criteria Found
+    // Returns What Ever The Searc Criteria Found
 }
 
 function _layers( layer_name ){
