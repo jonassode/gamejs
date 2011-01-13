@@ -13,7 +13,7 @@ Dependencies
 -jQuery
 
 Current Version
-0.017
+0.018
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -46,4 +46,5 @@ History
 0.016:  It is now not possible for a tile to move outside of the tilemap
 0.017:	Tilemap now has backgrounds for each tile position
 	Map follows you around if map is larger than visible map
-
+0.018:	Fixed bug with visible cols, you could walk of screen
+	Added logging function that should be overwritten

@@ -146,7 +146,7 @@ function _node_class( attributes ){
         // Calculate New Direction
         var newrow = row + direction.row;
         var newcol = col + direction.col;
-
+        _log("newrow:"+newrow);
         if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols)) {
             this.row = newrow;
             this.col = newcol;
@@ -161,7 +161,7 @@ function _node_class( attributes ){
             var tilepositionrow = (row-this.tilemap.row+1);
             var tilepositioncol = (col-this.tilemap.col+1);
 
-            if (!(newtilemaprow < 0) && !(newtilemaprow > (this.tilemap.rows-this.tilemap.visiblecols)) && ( tilepositionrow == centerrow) ){
+            if (!(newtilemaprow < 0) && !(newtilemaprow > (this.tilemap.rows-this.tilemap.visiblerows)) && ( tilepositionrow == centerrow) ){
                 this.tilemap.row = newtilemaprow;
             }
             if (!(newtilemapcol < 0) && !(newtilemapcol > (this.tilemap.cols-this.tilemap.visiblecols)) && ( tilepositioncol == centercol) ){
@@ -171,6 +171,10 @@ function _node_class( attributes ){
             this.layer.screen.draw();
         }
     }
+}
+
+function _log(msg){
+    //
 }
 
 function _screen_class( canvas_name, attributes ){
@@ -301,6 +305,7 @@ function _tilemap_class( attributes ){
     }
 
     this.draw = function(){
+        _log('Draw row:'+this.row)
         for (var row = this.row; row < (this.visiblerows+this.row); row++) {
             for (var col = this.col; col < (this.visiblecols+this.col); col++) {
                 var tile = this.tiles[row][col]
