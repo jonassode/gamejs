@@ -13,7 +13,7 @@ Dependencies
 -jQuery
 
 Current Version
-0.018
+0.019
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -48,3 +48,6 @@ History
 	Map follows you around if map is larger than visible map
 0.018:	Fixed bug with visible cols, you could walk of screen
 	Added logging function that should be overwritten
+0.019:	Moving a tile now only redraws the tilemap and not entire screen
+	Added node attribute .walkable which determines if a tile can move onto it. Default is true
+

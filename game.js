@@ -122,6 +122,11 @@ function _node_class( attributes ){
     } else {
         this.color = '#000';
     }
+    if (attributes.walkable != null ) {
+        this.walkable = attributes.walkable;
+    } else {
+        this.walkable = true;
+    }
 
     // Draws the node on canvas
     // Returns self-reference
@@ -146,8 +151,8 @@ function _node_class( attributes ){
         // Calculate New Direction
         var newrow = row + direction.row;
         var newcol = col + direction.col;
-        _log("newrow:"+newrow);
-        if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols)) {
+
+        if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols) && !(this.tilemap.backgrounds[newrow][newcol].walkable == false) ) {
             this.row = newrow;
             this.col = newcol;
 
@@ -168,7 +173,7 @@ function _node_class( attributes ){
                 this.tilemap.col = newtilemapcol;
             }
 
-            this.layer.screen.draw();
+            this.tilemap.draw();
         }
     }
 }
@@ -305,7 +310,6 @@ function _tilemap_class( attributes ){
     }
 
     this.draw = function(){
-        _log('Draw row:'+this.row)
         for (var row = this.row; row < (this.visiblerows+this.row); row++) {
             for (var col = this.col; col < (this.visiblecols+this.col); col++) {
                 var tile = this.tiles[row][col]
