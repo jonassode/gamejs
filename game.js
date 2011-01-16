@@ -3,10 +3,14 @@ if (typeof jQuery == 'undefined') {
     alert('Warning!\njQuery is not loaded.\nAs of version 0.010 game.js requires jQuery\nPlease add a call to jQuery in your website and reload page.');
 }
 
-// Constants
+// Globals
 var _visible_screen = null;
 var _id_list = new Array();
 var _id_hash = {};
+var _images = new Array();
+var _preloading_screen = null;
+var _first_screen = null;
+
 // Movement
 var _up = {
     row:-1,
@@ -33,6 +37,7 @@ function _layer_class( layer_name ){
     this.visible = true;
     this.nodes = new Array();
     this.tilemaps = new Array();
+    this.lables = new Array();
 
     // Add Layer to Id Hahs
     _id_hash[this.id] = this
@@ -46,6 +51,9 @@ function _layer_class( layer_name ){
         }
         for (var tmi = 0; tmi < this.tilemaps.length; tmi++) {
             this.tilemaps[tmi].draw();
+        }
+        for (var li = 0; li < this.lables.length; li++) {
+            this.lables[li].draw();
         }
         return this;
     };
@@ -64,16 +72,17 @@ function _layer_class( layer_name ){
     // Create a node
     this.node = function ( attributes ){
         var n = new _node_class( attributes );
-        this.add_node(n);
-        return n;
-    };
-
-    // Adds specified node to layer
-    // Returns reference to new node
-    this.add_node = function(n){
         n.layer = this;
         this.nodes[this.nodes.length] = n;
         return n;
+    };
+
+    // Create a node
+    this.lable = function( attributes ){
+        var l = new _lable_class( attributes );
+        l.layer = this;
+        this.lables[this.lables.length] = l;
+        return l;
     };
 
     // Create a tilemap
@@ -93,40 +102,17 @@ function _node_class( attributes ){
         this.type = 'image';
         this.image = new Image();
         this.image.src = attributes.img;
+        _images[_images.length] = this.image;
     } else {
         this.type = 'block';
     }
 
-    if (attributes.x != null ) {
-        this.x = attributes.x;
-    } else {
-        this.x = 0;
-    }
-    if (attributes.y != null ) {
-        this.y = attributes.y;
-    } else {
-        this.y = 0;
-    }
-    if (attributes.width != null ) {
-        this.width = attributes.width;
-    } else {
-        this.width = null;
-    }
-    if (attributes.height != null ) {
-        this.height = attributes.height;
-    } else {
-        this.height = null;
-    }
-    if (attributes.color != null ) {
-        this.color = attributes.color;
-    } else {
-        this.color = '#000';
-    }
-    if (attributes.walkable != null ) {
-        this.walkable = attributes.walkable;
-    } else {
-        this.walkable = true;
-    }
+    this.x = (attributes.x || 0);
+    this.y = (attributes.y || 0);
+    this.width = (attributes.width || null);
+    this.height = (attributes.height || null);
+    this.color = (attributes.color || '#000');
+    this.walkable = (attributes.walkable || true);
 
     // Draws the node on canvas
     // Returns self-reference
@@ -179,7 +165,7 @@ function _node_class( attributes ){
 }
 
 function _log(msg){
-    //
+//
 }
 
 function _screen_class( canvas_name, attributes ){
@@ -190,16 +176,9 @@ function _screen_class( canvas_name, attributes ){
     this.canvas = document.getElementById( canvas_name );
     this.context = this.canvas.getContext("2d");
     this.keypresses = {};
-    if (attributes.offsetx != null ) {
-        this.offsetx = attributes.offsetx;
-    } else {
-        this.offsetx = 0;
-    }
-    if (attributes.offsety != null ) {
-        this.offsety = attributes.offsety;
-    } else {
-        this.offsety = 0;
-    }
+
+    this.offsetx = (attributes.offsetx || 0);
+    this.offsety = (attributes.offsety || 0);
 
     // Add screen to Object Hash
     _id_hash[this.id] = this
@@ -233,6 +212,26 @@ function _screen_class( canvas_name, attributes ){
     };
 
 }
+
+function _lable_class( attributes ){
+    this.x = (attributes.x || 0);
+    this.y = (attributes.y || 0);
+    this.text = (attributes.text || "");
+    this.font = (attributes.font || '12px sans-serif');
+    this.color = (attributes.color || '#000');
+    this.baseline = (attributes.baseline || 'top');
+    ;
+
+    this.draw = function(){
+        var context = this.layer.screen.context;
+        context.fillStyle = this.color;
+        context.font = this.font;
+        context.textBaseline = this.baseline;
+        context.color = this.color;
+        context.fillText  (this.text, this.x, this.y);
+    }
+}
+
 
 function _tilemap_class( attributes ){
     this.id = _generate_id("tm");
@@ -372,6 +371,44 @@ function _generate_id(type){
     _id_list[_id_list.length] = new_id;
     return new_id;
 }
+
+function _load(screen){
+    _first_screen = screen;
+    _preloading_screen = _screen(screen.canvas.id, {});
+    var l = _preloading_screen.layer("_gamejs_loading_screen");
+    l.node({
+        color:'black',
+        width:_preloading_screen.canvas.width,
+        height:_preloading_screen.canvas.height
+    });
+    l.lable({
+        text: 'Please wait while loading.',
+        color:'#fff',
+        font:'20pt Helvetica',
+        x: 20,
+        y: 20
+    });
+    _update_loading_screen();
+}
+
+function _update_loading_screen(){
+
+    var loaded = 0;
+
+    for(var i=0; i < _images.length; i++)
+    {
+        if(_images[i].complete){
+            loaded++;
+        }
+    }
+    if (loaded < _images.length){
+        _preloading_screen.draw();
+        setTimeout('_update_loading_screen()',250);
+    } else {
+        _first_screen.draw();
+    }
+}
+
 
 $(document).keyup(function(event){
     var method = String.fromCharCode(event.which);

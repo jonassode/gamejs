@@ -3,17 +3,18 @@ game.js is a html5 gaming library
 There is no documentation other than the code, this file and index.html
 Check out index.html for an example of usage
   
-Objects
+Elements
 -Screen
 -Layer
--Node
--Tilemap
+-Node ( Blocks and Images )
+-Tilemap ( for tile based games/applications )
+-Lable ( text )
 
 Dependencies
 -jQuery
 
 Current Version
-0.019
+0.020
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -50,4 +51,7 @@ History
 	Added logging function that should be overwritten
 0.019:	Moving a tile now only redraws the tilemap and not entire screen
 	Added node attribute .walkable which determines if a tile can move onto it. Default is true
+0.020:	Added new element lable for posting text
+	Added _load method to invoke game
+	Added preloading of images
 

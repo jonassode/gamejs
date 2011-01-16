@@ -24,6 +24,10 @@ window.onload = function () {
     lt.node({img:'tree.gif', y:110, x:20});
     lt.node({img:'tree.gif', y:110, x:60});
     lt.node({img:'tree.gif', y:110, x:80});
+
+    var ltext = Index.screen.layer("text");
+    ltext.lable({text:'Tff Font', x:150, y:0, font:'30px KulminoituvaRegular'});
+    ltext.lable({text:'Css Font', x:150, y:50, font:'30px Impact'});
    
     var lbox = Index.screen.layer("boxes");
     lbox.node({x:20,color:'silver',width:10,height:10});
@@ -35,6 +39,7 @@ window.onload = function () {
     lmenu = Index.menu_screen.layer("menu");
     lmenu.node({img:'menu.png'});
 
-    Index.menu_screen.draw();
+    _load(Index.menu_screen);
+
 };
 
