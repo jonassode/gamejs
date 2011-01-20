@@ -313,14 +313,18 @@ function _textbox_class( attributes ){
                         imgx = x + this.padding + (col * _letter_width);
                         imgy = y + this.padding + (row * _letter_height);
                         img = letters[character];
-                        this.layer.screen.context.drawImage(img, imgx, imgy);
-                        col = col + 1;
+                        if (img != null){
+                            this.layer.screen.context.drawImage(img, imgx, imgy);
+                            col = col + 1;
+                        } else {
+                            _log('Trided to write character '+character+' which is not supported.');
+                        }
                     }
                 }
                 col = col + 1;
             }
-            }
-}
+        }
+    }
 }
 
 
@@ -371,12 +375,13 @@ function _tilemap_class( attributes ){
     }
 
     // Creating Tiles Array
+    var row;
     this.tiles = new Array(this.rows);
-    for (var row = 0; row < this.rows; row++) {
+    for (row = 0; row < this.rows; row++) {
         this.tiles[row] = new Array(this.cols);
     }
     this.backgrounds = new Array(this.rows);
-    for (var row = 0; row < this.rows; row++) {
+    for (row = 0; row < this.rows; row++) {
         this.backgrounds[row] = new Array(this.cols);
     }
 
@@ -433,8 +438,6 @@ function _tilemap_class( attributes ){
     }
 
 }
-
-
 
 // Builders
 // _screen
