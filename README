@@ -15,7 +15,7 @@ Dependencies
 -jQuery
 
 Current Version
-DEV 0.021
+DEV 0.022
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -56,4 +56,4 @@ History
 	Added _load method to invoke game
 	Added preloading of images
 0.021:	Added textbox element
-
+0.022:	Added node types 'tile' and 'background'

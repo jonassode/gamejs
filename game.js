@@ -153,7 +153,7 @@ function _node_class( attributes ){
         if (this.type == 'block') {
             this.layer.screen.context.fillStyle = this.color;
             this.layer.screen.context.fillRect(this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
-        } else if(this.type == 'image') {
+        } else if(this.type == 'image' || this.type == 'tile' || this.type == 'background') {
             if (this.height != null && this.width != null) {
                 this.layer.screen.context.drawImage(this.image, this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
             } else {
@@ -165,34 +165,36 @@ function _node_class( attributes ){
 
     // Movement
     this.move = function(direction){
-        var row = this.row;
-        var col = this.col;
-        // Calculate New Direction
-        var newrow = row + direction.row;
-        var newcol = col + direction.col;
+        if (this.type == 'tile'){
+            var row = this.row;
+            var col = this.col;
+            // Calculate New Direction
+            var newrow = row + direction.row;
+            var newcol = col + direction.col;
 
-        if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols) && !(this.tilemap.backgrounds[newrow][newcol].walkable == false) ) {
-            this.row = newrow;
-            this.col = newcol;
+            if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols) && !(this.tilemap.backgrounds[newrow][newcol].walkable == false) ) {
+                this.row = newrow;
+                this.col = newcol;
 
-            this.tilemap.tiles[this.row][this.col] = this;
-            this.tilemap.tiles[row][col] = null;
-            //
-            var newtilemaprow = this.tilemap.row + direction.row;
-            var newtilemapcol = this.tilemap.col + direction.col;
-            var centerrow = Math.round(this.tilemap.visiblerows/2);
-            var centercol = Math.round(this.tilemap.visiblecols/2);
-            var tilepositionrow = (row-this.tilemap.row+1);
-            var tilepositioncol = (col-this.tilemap.col+1);
+                this.tilemap.tiles[this.row][this.col] = this;
+                this.tilemap.tiles[row][col] = null;
+                //
+                var newtilemaprow = this.tilemap.row + direction.row;
+                var newtilemapcol = this.tilemap.col + direction.col;
+                var centerrow = Math.round(this.tilemap.visiblerows/2);
+                var centercol = Math.round(this.tilemap.visiblecols/2);
+                var tilepositionrow = (row-this.tilemap.row+1);
+                var tilepositioncol = (col-this.tilemap.col+1);
 
-            if (!(newtilemaprow < 0) && !(newtilemaprow > (this.tilemap.rows-this.tilemap.visiblerows)) && ( tilepositionrow == centerrow) ){
-                this.tilemap.row = newtilemaprow;
+                if (!(newtilemaprow < 0) && !(newtilemaprow > (this.tilemap.rows-this.tilemap.visiblerows)) && ( tilepositionrow == centerrow) ){
+                    this.tilemap.row = newtilemaprow;
+                }
+                if (!(newtilemapcol < 0) && !(newtilemapcol > (this.tilemap.cols-this.tilemap.visiblecols)) && ( tilepositioncol == centercol) ){
+                    this.tilemap.col = newtilemapcol;
+                }
+
+                this.tilemap.draw();
             }
-            if (!(newtilemapcol < 0) && !(newtilemapcol > (this.tilemap.cols-this.tilemap.visiblecols)) && ( tilepositioncol == centercol) ){
-                this.tilemap.col = newtilemapcol;
-            }
-
-            this.tilemap.draw();
         }
     }
 }
@@ -378,6 +380,7 @@ function _tilemap_class( attributes ){
         tile.row = row;
         tile.col = col;
         tile.tilemap = this;
+        tile.type = 'tile';
         this.tiles[row][col] = tile;
         return tile;
     }
@@ -386,6 +389,7 @@ function _tilemap_class( attributes ){
         background.layer = this.layer;
         background.row = row;
         background.col = col;
+        background.type = 'background';
         background.tilemap = this;
         this.backgrounds[row][col] = background;
         return background;
