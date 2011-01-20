@@ -15,7 +15,7 @@ Dependencies
 -jQuery
 
 Current Version
-DEV 0.023
+DEV 0.024
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -60,4 +60,5 @@ History
 0.023:	Node.tile now has direction
 	Fixed defect in keyhandling
 	Fixed defect with textbox
+0.024:	Added numbers
 

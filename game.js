@@ -18,7 +18,7 @@ var _letter_width = 5 + _letter_padding; // Including Padding
 var _letter_height = 8 + _letter_padding; // Including Padding
 
 // Load Alphabet
-var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,";
+var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890";
 var letters = {};
 
 for (var counter = 0;counter < alphabet.length ;counter++ ) {
