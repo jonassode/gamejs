@@ -166,6 +166,9 @@ function _node_class( attributes ){
     // Movement
     this.move = function(direction){
         if (this.type == 'tile'){
+            // Set direction
+            this.direction = direction;
+            
             var row = this.row;
             var col = this.col;
             // Calculate New Direction
@@ -283,38 +286,41 @@ function _textbox_class( attributes ){
         var row = 0;
         var col = 0;
         var character = null;
+        var img = null;
+        var word = null;
 
         width = (this.width * _letter_width)+(this.padding * 2)- _letter_padding;
-        height = (this.height * _letter_height)+(this.padding * 2-_letter_padding);
+        height = (this.height * _letter_height)+(this.padding * 2) -_letter_padding;
 
         this.layer.screen.context.fillStyle = this.color;
         this.layer.screen.context.fillRect(x, y, width, height);
-        var img = null;
-        var words = this.text.split(" ");
-        var word = null;
-        for (var wi=0; wi< words.length; wi++){
-            word = words[wi];
-            if(word.length+col > this.width){
-                row = row + 1;
-                col = 0;
-            }
-            for (var counter = 0; counter < word.length; counter++ ) {
-                character = word[counter];
-                if (character == "\n"){
+        if (this.text != null && this.text != undefined){
+
+            var words = this.text.toString().split(" ");
+            for (var wi=0; wi< words.length; wi++){
+                word = words[wi];
+                if(word.length+col > this.width){
                     row = row + 1;
                     col = 0;
-                } else {
-                    character = character.toUpperCase();
-                    imgx = x + this.padding + (col * _letter_width);
-                    imgy = y + this.padding + (row * _letter_height);
-                    img = letters[character];
-                    this.layer.screen.context.drawImage(img, imgx, imgy);
-                    col = col + 1;
                 }
+                for (var counter = 0; counter < word.length; counter++ ) {
+                    character = word[counter];
+                    if (character == "\n"){
+                        row = row + 1;
+                        col = 0;
+                    } else {
+                        character = character.toUpperCase();
+                        imgx = x + this.padding + (col * _letter_width);
+                        imgy = y + this.padding + (row * _letter_height);
+                        img = letters[character];
+                        this.layer.screen.context.drawImage(img, imgx, imgy);
+                        col = col + 1;
+                    }
+                }
+                col = col + 1;
             }
-            col = col + 1;
-        }
-    }
+            }
+}
 }
 
 
@@ -499,7 +505,7 @@ function _update_loading_screen(){
 
 $(document).keyup(function(event){
     var method = String.fromCharCode(event.which);
-    if ( _visible_screen.keypresses[method] != null ) {
+    if ( _visible_screen != null && _visible_screen != undefined && _visible_screen.keypresses[method] != null ) {
         _visible_screen.keypresses[method]();
     }
 });
