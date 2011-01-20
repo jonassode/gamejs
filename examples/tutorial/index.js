@@ -27,7 +27,8 @@ window.onload = function () {
 
     var ltext = Index.screen.layer("text");
     ltext.lable({text:'Tff Font', x:150, y:0, font:'30px KulminoituvaRegular'});
-    ltext.lable({text:'Css Font', x:150, y:50, font:'30px Impact'});
+    ltext.lable({text:'Css Font', x:150, y:50, font:'30px Arial'});
+    ltext.textbox({x:5, y:150, width:40, height:4, padding:8, text:"JONAS:\nNina, Wake up! Something is coming. Hurry, we must leave now! It is coming up the stairs!"});
    
     var lbox = Index.screen.layer("boxes");
     lbox.node({x:20,color:'silver',width:10,height:10});

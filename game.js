@@ -3,6 +3,9 @@ if (typeof jQuery == 'undefined') {
     alert('Warning!\njQuery is not loaded.\nAs of version 0.010 game.js requires jQuery\nPlease add a call to jQuery in your website and reload page.');
 }
 
+var scripts = document.getElementsByTagName("script");
+var gamejs_folder = (scripts[scripts.length-1].src).replace("game.js","");
+
 // Globals
 var _visible_screen = null;
 var _id_list = new Array();
@@ -10,6 +13,19 @@ var _id_hash = {};
 var _images = new Array();
 var _preloading_screen = null;
 var _first_screen = null;
+var _letter_padding = 2;
+var _letter_width = 5 + _letter_padding; // Including Padding
+var _letter_height = 8 + _letter_padding; // Including Padding
+
+// Load Alphabet
+var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,";
+var letters = {};
+
+for (var counter = 0;counter < alphabet.length ;counter++ ) {
+    letters[alphabet[counter]] = new Image();
+    letters[alphabet[counter]].src = gamejs_folder + "images/"+alphabet[counter]+".gif";
+    _images[_images.length] = letters[alphabet[counter]];
+}
 
 // Movement
 var _up = {
@@ -38,6 +54,7 @@ function _layer_class( layer_name ){
     this.nodes = new Array();
     this.tilemaps = new Array();
     this.lables = new Array();
+    this.textboxes = new Array();
 
     // Add Layer to Id Hahs
     _id_hash[this.id] = this
@@ -55,6 +72,10 @@ function _layer_class( layer_name ){
         for (var li = 0; li < this.lables.length; li++) {
             this.lables[li].draw();
         }
+        for (var tbi = 0; tbi < this.textboxes.length; tbi++) {
+            this.textboxes[tbi].draw();
+        }
+
         return this;
     };
 
@@ -77,12 +98,20 @@ function _layer_class( layer_name ){
         return n;
     };
 
-    // Create a node
+    // Create a lable
     this.lable = function( attributes ){
         var l = new _lable_class( attributes );
         l.layer = this;
         this.lables[this.lables.length] = l;
         return l;
+    };
+
+    // Create a lable
+    this.textbox = function( attributes ){
+        var tb = new _textbox_class( attributes );
+        tb.layer = this;
+        this.textboxes[this.textboxes.length] = tb;
+        return tb;
     };
 
     // Create a tilemap
@@ -112,7 +141,11 @@ function _node_class( attributes ){
     this.width = (attributes.width || null);
     this.height = (attributes.height || null);
     this.color = (attributes.color || '#000');
-    this.walkable = (attributes.walkable || true);
+    if (attributes.walkable != null){
+        this.walkable = attributes.walkable;
+    } else {
+        this.walkable = true;
+    }
 
     // Draws the node on canvas
     // Returns self-reference
@@ -220,7 +253,6 @@ function _lable_class( attributes ){
     this.font = (attributes.font || '12px sans-serif');
     this.color = (attributes.color || '#000');
     this.baseline = (attributes.baseline || 'top');
-    ;
 
     this.draw = function(){
         var context = this.layer.screen.context;
@@ -229,6 +261,57 @@ function _lable_class( attributes ){
         context.textBaseline = this.baseline;
         context.color = this.color;
         context.fillText  (this.text, this.x, this.y);
+    }
+}
+
+function _textbox_class( attributes ){
+    this.padding = (attributes.padding || 3);
+    this.x = (attributes.x || 0);
+    this.y = (attributes.y || 0);
+    this.text = (attributes.text || "");
+    this.width = (attributes.width || 0);
+    this.color = (attributes.color || '#000');
+    this.height = (attributes.height || 0);
+
+    this.draw = function(){
+        var x = this.x + this.layer.screen.offsetx;
+        var y = this.y + this.layer.screen.offsety;
+        var imgx = 0;
+        var imgy = 0;
+        var row = 0;
+        var col = 0;
+        var character = null;
+
+        width = (this.width * _letter_width)+(this.padding * 2)- _letter_padding;
+        height = (this.height * _letter_height)+(this.padding * 2-_letter_padding);
+
+        this.layer.screen.context.fillStyle = this.color;
+        this.layer.screen.context.fillRect(x, y, width, height);
+        var img = null;
+        var words = this.text.split(" ");
+        var word = null;
+        for (var wi=0; wi< words.length; wi++){
+            word = words[wi];
+            if(word.length+col > this.width){
+                row = row + 1;
+                col = 0;
+            }
+            for (var counter = 0; counter < word.length; counter++ ) {
+                character = word[counter];
+                if (character == "\n"){
+                    row = row + 1;
+                    col = 0;
+                } else {
+                    character = character.toUpperCase();
+                    imgx = x + this.padding + (col * _letter_width);
+                    imgy = y + this.padding + (row * _letter_height);
+                    img = letters[character];
+                    this.layer.screen.context.drawImage(img, imgx, imgy);
+                    col = col + 1;
+                }
+            }
+            col = col + 1;
+        }
     }
 }
 

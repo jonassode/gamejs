@@ -8,13 +8,14 @@ Elements
 -Layer
 -Node ( Blocks and Images )
 -Tilemap ( for tile based games/applications )
--Lable ( text )
+-Lable ( css text )
+-Textbox ( custom text box )
 
 Dependencies
 -jQuery
 
 Current Version
-0.020
+DEV 0.021
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -54,4 +55,5 @@ History
 0.020:	Added new element lable for posting text
 	Added _load method to invoke game
 	Added preloading of images
+0.021:	Added textbox element
 
