@@ -136,6 +136,7 @@ function _node_class( attributes ){
         this.type = 'block';
     }
 
+    this.onclick_event = null;
     this.x = (attributes.x || 0);
     this.y = (attributes.y || 0);
     this.width = (attributes.width || null);
@@ -200,6 +201,12 @@ function _node_class( attributes ){
             }
         }
     }
+
+    this.onclick = function(onclick_function){
+        this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
+        this.onclick_event = onclick_function;
+    }
+
 }
 
 function _log(msg){
@@ -214,6 +221,7 @@ function _screen_class( canvas_name, attributes ){
     this.canvas = document.getElementById( canvas_name );
     this.context = this.canvas.getContext("2d");
     this.keypresses = {};
+    this.clickable_objects = new Array();
 
     this.offsetx = (attributes.offsetx || 0);
     this.offsety = (attributes.offsety || 0);
@@ -409,20 +417,20 @@ function _tilemap_class( attributes ){
     this.draw = function(){
         for (var row = this.row; row < (this.visiblerows+this.row); row++) {
             for (var col = this.col; col < (this.visiblecols+this.col); col++) {
-                var tile = this.tiles[row][col]
-                if ( tile != null){
-                    tile.x = ((col-this.col) * this.tilesize) + this.x;
-                    tile.y = ((row-this.row) * this.tilesize) + this.y;
-                    tile.width = this.tilesize;
-                    tile.height = this.tilesize;
-                    tile.draw();
+                //var tile = this.tiles[row][col]
+                if ( this.tiles[row][col] != null){
+                    this.tiles[row][col].x = ((col-this.col) * this.tilesize) + this.x;
+                    this.tiles[row][col].y = ((row-this.row) * this.tilesize) + this.y;
+                    this.tiles[row][col].width = this.tilesize;
+                    this.tiles[row][col].height = this.tilesize;
+                    this.tiles[row][col].draw();
                 } else {
-                    var bg = this.backgrounds[row][col]
-                    bg.x = ((col-this.col) * this.tilesize) + this.x;
-                    bg.y = ((row-this.row) * this.tilesize) + this.y;
-                    bg.width = this.tilesize;
-                    bg.height = this.tilesize;
-                    bg.draw();
+                    //var bg = this.backgrounds[row][col]
+                    this.backgrounds[row][col].x = ((col-this.col) * this.tilesize) + this.x;
+                    this.backgrounds[row][col].y = ((row-this.row) * this.tilesize) + this.y;
+                    this.backgrounds[row][col].width = this.tilesize;
+                    this.backgrounds[row][col].height = this.tilesize;
+                    this.backgrounds[row][col].draw();
                 }
             }
         }
@@ -443,6 +451,23 @@ function _tilemap_class( attributes ){
 // _screen
 function _screen( screen_name, attributes ){
     var s = new _screen_class( screen_name, attributes )
+
+    $("#"+screen_name).click(function(e){
+
+        var x = Math.floor((e.pageX-$("#"+screen_name).offset().left));
+        var y = Math.floor((e.pageY-$("#"+screen_name).offset().top));
+
+        if ( _visible_screen != null && _visible_screen != undefined ) {
+        
+            for (var coi = 0; coi < _visible_screen.clickable_objects.length; coi++) {
+                var object = _visible_screen.clickable_objects[coi];
+                if ( object.x <= x && (object.x + object.width) >= x && object.y <= y && (object.y + object.height) >= y ){
+                    object.onclick_event();
+                }
+            }
+        }
+    });
+    
     return s;
 }
 
@@ -512,3 +537,5 @@ $(document).keyup(function(event){
         _visible_screen.keypresses[method]();
     }
 });
+
+
