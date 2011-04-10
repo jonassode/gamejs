@@ -203,7 +203,9 @@ function _node_class( attributes ){
     }
 
     this.onclick = function(onclick_function){
+        // Add tile to list of clickable objects on screen
         this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
+        // Register function for this tiles onlick event
         this.onclick_event = onclick_function;
     }
 
@@ -452,22 +454,6 @@ function _tilemap_class( attributes ){
 function _screen( screen_name, attributes ){
     var s = new _screen_class( screen_name, attributes )
 
-    $("#"+screen_name).click(function(e){
-
-        var x = Math.floor((e.pageX-$("#"+screen_name).offset().left));
-        var y = Math.floor((e.pageY-$("#"+screen_name).offset().top));
-
-        if ( _visible_screen != null && _visible_screen != undefined ) {
-        
-            for (var coi = 0; coi < _visible_screen.clickable_objects.length; coi++) {
-                var object = _visible_screen.clickable_objects[coi];
-                if ( object.x <= x && (object.x + object.width) >= x && object.y <= y && (object.y + object.height) >= y ){
-                    object.onclick_event();
-                }
-            }
-        }
-    });
-    
     return s;
 }
 
@@ -494,6 +480,25 @@ function _generate_id(type){
 }
 
 function _load(screen){
+
+    // Register Keypress Function
+    var canvas_name = screen.canvas.id
+    $("#"+canvas_name).click(function(e){
+
+        var x = Math.floor((e.pageX-$("#"+canvas_name).offset().left));
+        var y = Math.floor((e.pageY-$("#"+canvas_name).offset().top));
+
+        if ( _visible_screen != null && _visible_screen != undefined ) {
+
+            for (var coi = 0; coi < _visible_screen.clickable_objects.length; coi++) {
+                var object = _visible_screen.clickable_objects[coi];
+                if ( object.x <= x && (object.x + object.width) >= x && object.y <= y && (object.y + object.height) >= y ){
+                    object.onclick_event();
+                }
+            }
+        }
+    });
+
     _first_screen = screen;
     _preloading_screen = _screen(screen.canvas.id, {});
     var l = _preloading_screen.layer("_gamejs_loading_screen");
