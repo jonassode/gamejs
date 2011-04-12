@@ -15,7 +15,7 @@ Dependencies
 -jQuery
 
 Current Version
-DEV 0.027
+DEV 0.028
 
 History
 0.001:	Nodes have attributes x, y, width, height, color
@@ -64,4 +64,5 @@ History
 0.025:	Added Error handling for when trying to write a character in a textbox that is not supported.
 0.026:	Added possiblity to register clicks to nodes
 0.027:	Fixed but in onclick
+0.028:	Fixed Defect when drawing tilemaps without background tiles
 

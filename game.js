@@ -426,7 +426,7 @@ function _tilemap_class( attributes ){
                     this.tiles[row][col].width = this.tilesize;
                     this.tiles[row][col].height = this.tilesize;
                     this.tiles[row][col].draw();
-                } else {
+                } else if (this.backgrounds[row][col] != null)  {
                     //var bg = this.backgrounds[row][col]
                     this.backgrounds[row][col].x = ((col-this.col) * this.tilesize) + this.x;
                     this.backgrounds[row][col].y = ((row-this.row) * this.tilesize) + this.y;
