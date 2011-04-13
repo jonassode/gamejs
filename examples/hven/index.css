@@ -1,0 +1,15 @@
+canvas
+{
+    background-color: #fff;
+}
+
+body
+{
+    background-color:lightblue;
+}
+
+@font-face {
+    font-family: 'KulminoituvaRegular';
+    src: url('kulminoituva.ttf');
+}
+
