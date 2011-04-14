@@ -8,7 +8,24 @@
     </head>
     <body>
         <center>
-            <canvas id="hven_canvas" width="850" height="800" ></canvas><br/>
+            <table>
+                <tr>
+                    <td>
+                        <canvas id="hven_canvas" width="850" height="800" ></canvas>
+                    </td>
+                    <td valign="top">
+                        <b>Player List</b>
+                        <div id="player_list""></div><br>
+                        <button onclick='Director.end_turn()'>End Turn</button><br>
+                        <br>
+                        <b>Cards In Pile</b><br>
+                        <div id="cards"></div><br>
+                        <br>
+                        <b>Your Cards</b><br>
+                        <div id="player_cards"></div><br>
+                    </td>
+                </tr>
+            </table>
         </center>
     </body>
 </html>
