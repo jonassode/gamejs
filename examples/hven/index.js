@@ -219,10 +219,16 @@ window.onload = function () {
         image:"water.gif",
         name:"Water"
     })
+    var observatory_card = new Resource({
+        type:"card",
+        image:"observatory.gif",
+        name:"Observatory"
+    })
     Index.library.add_resource(town_card, 3)
     Index.library.add_resource(tree_card, 3)
     Index.library.add_resource(farmer_card, 3)
     Index.library.add_resource(water_card, 3)
+    Index.library.add_resource(observatory_card, 1)
 
     _load(Index.screen);
     Director.start_game();
