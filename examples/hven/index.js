@@ -55,6 +55,8 @@ function _director_class( ){
     }
 
     this.end_turn = function(){
+        // End Of Turn Moves
+        _end_of_turn();
         // Change To Next Player
         for(var p in this.players)
         {
@@ -69,11 +71,15 @@ function _director_class( ){
             }
         }
         this.draw_player_list();
-        _end_of_turn();
+        // Beginning Of Turn Moves
+        _beginning_of_turn();
+
     }
 
     this.start_game = function(){
         this.draw_player_list();
+        _start_game();
+        _beginning_of_turn();
     }
 
     this.player = function(name){
@@ -93,6 +99,10 @@ function _end_of_turn(){
 // Player Can Override This
 }
 
+function _start_game(){
+// Does Nothing
+// Player Can Override This
+}
 function Library(){
     this.list = new Array();
 
@@ -111,12 +121,27 @@ function Library(){
     this.item = function( i ){
         return this.list[i]
     }
+
+    this.shuffle = function(){
+        this.list.sort(function() {
+            return 0.5 - Math.random()
+        });
+    }
+
+    this.pop = function(){
+        return this.list.splice(0, 1)[0];
+    }
 }
 
 function Resource( attributes ){
     this.type = (attributes.type || "stuff");
     this.image = (attributes.image || "");
     this.name = (attributes.name || "stuff");
+
+    this.onclick = function(onclick_function){
+
+    }
+
 }
 
 var Director = new _director_class();
@@ -124,7 +149,8 @@ var Director = new _director_class();
 // Namespace
 var Index = {
     screen: null,
-    library: null
+    library: null,
+    selected_tile: null
 };
 
 // Init
@@ -146,6 +172,18 @@ window.onload = function () {
         tilesize:50,
         cols:17,
         rows:16
+    });
+
+    tm.background(1,1,{
+        img:'images/alien.gif'
+    }).onclick(function(){
+        if(Index.selected_tile != null){
+            tm.tile(this.col, this.row, {
+                img:'images/'+Index.selected_tile.image
+                });
+            tm.draw();
+            Index.selected_tile = null;
+        }
     });
 
     // Adding Players
@@ -171,15 +209,20 @@ window.onload = function () {
         image:"tree.gif",
         name:"Tree"
     })
-    Index.library.add_resource(town_card, 5)
-    Index.library.add_resource(tree_card, 5)
-    draw_cards();
-
-    Director.player("Jonas").add_resource(tree_card);
-    Director.player("Nisse").add_resource(town_card);
-    Director.player("Matte").add_resource(tree_card);
-    Director.player("Matte").add_resource(town_card);
-    draw_player_cards();
+    var farmer_card = new Resource({
+        type:"card",
+        image:"man.gif",
+        name:"Farmer"
+    })
+    var water_card = new Resource({
+        type:"card",
+        image:"water.gif",
+        name:"Water"
+    })
+    Index.library.add_resource(town_card, 3)
+    Index.library.add_resource(tree_card, 3)
+    Index.library.add_resource(farmer_card, 3)
+    Index.library.add_resource(water_card, 3)
 
     _load(Index.screen);
     Director.start_game();
@@ -193,20 +236,43 @@ function _log(msg) {
 //    $('#log').val(msg+"\n"+$('#log').val());
 }
 
-function _end_of_turn(){
+function _start_game(){
+    Index.library.shuffle();
     draw_cards();
     draw_player_cards();
 }
 
+function _beginning_of_turn(){
+    var card = Index.library.pop();
+    if(card != undefined){
+        Director.current_player.add_resource(card);
+        alert(Director.current_player.name + ' drew ' + card.name);
+    }
+    Index.selected_tile = null;
+    draw_cards();
+    draw_player_cards();
+}
+
+function _end_of_turn(){
+
+}
+
 function draw_cards(){
-    $('#cards').html(Index.library.length())
+    var html = ""
+    for(var i=0;i<Index.library.length();i++){
+        html = html + '<img src="images/' +Index.library.item(i).image + '" >' + '<br>';
+    }
+
+    $('#cards').html(html)
+//    $('#cards').html(Index.library.length())
 }
 
 function draw_player_cards(){
     var html = ""
     var player_cards = Director.current_player.get_resources("card");
     for(var i=0;i<player_cards.length;i++){
-        html = html + '<img src="images/' +player_cards[i].image + '">' + '<br>';
+        var card = player_cards[i];
+        html = html + '<img src="images/' + card.image + '" onclick="Index.selected_tile = Director.current_player.get_resources(\'card\')['+i+'];">' + '<br>';
     }
 
     $('#player_cards').html(html)
