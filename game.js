@@ -155,9 +155,9 @@ function _node_class( attributes ){
             this.layer.screen.context.fillStyle = this.color;
             this.layer.screen.context.fillRect(this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
         } else if(this.type == 'image' || this.type == 'tile' || this.type == 'background') {
-            if (this.height != null && this.width != null) {
+            if (this.height != null && this.width != null && this.image != null ) {
                 this.layer.screen.context.drawImage(this.image, this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
-            } else {
+            } else if (this.image != null ){
                 this.layer.screen.context.drawImage(this.image, this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety);
             }
         }
