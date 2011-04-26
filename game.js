@@ -405,6 +405,20 @@ function _tilemap_class( attributes ){
         this.tiles[row][col] = tile;
         return tile;
     }
+    this.place = function(row, col, tile){
+        var background = jQuery.extend(true, {}, tile);
+        background.layer = this.layer;
+        background.row = row;
+        background.col = col;
+        background.type = 'background';
+        background.tilemap = this;
+        this.backgrounds[row][col] = background;
+        if(background.onclick_event != null){
+            this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = background;
+        }
+
+        return background;
+    }
     this.background = function(row, col, attributes ){
         var background = new _node_class( attributes );
         background.layer = this.layer;

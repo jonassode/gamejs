@@ -24,6 +24,10 @@ function _player_class( attributes ){
         return a
     }
 
+    this.pop_resource = function(){
+        return this.resources.splice(0, 1)[0];
+    }
+
 }
 
 function _director_class( ){
@@ -113,7 +117,7 @@ function Library(){
     this.add_resource = function(resource, amount){
         for (i=0;i<amount;i++)
         {
-            this.list[this.list.length] = jQuery.extend(true, {}, resource);;
+            this.list[this.list.length] = jQuery.extend(true, {}, resource);
         }
 
     }
@@ -174,17 +178,32 @@ window.onload = function () {
         rows:16
     });
 
-    tm.background(1,1,{
-        img:'images/alien.gif'
-    }).onclick(function(){
-        if(Index.selected_tile != null){
-            tm.tile(this.col, this.row, {
+    var tile = new _node_class({
+        });
+    tile.layer = ltm
+    tile.onclick(function(){
+        if(Index.selected_tile != null && this.occupied != true){
+            tm.tile(this.row, this.col, {
                 img:'images/'+Index.selected_tile.image
-                });
+            });
             tm.draw();
             Index.selected_tile = null;
+            Director.current_player.pop_resource();
+            draw_player_cards();
+            this.occupied = true;
         }
     });
+
+    var a = [[1,1,8],[2,1,10],[3,1,11],[4,2,12],[5,2,13],[6,4,15],[7,5,15],[8,6,15],[9,6,14],[10,7,14],[11,8,14],[12,9,14],[13,9,14],[14,9,13]]
+
+    for(var i=0;i<a.length;i++){
+        var b=a[i];
+        for(var j=b[1];j<=b[2];j++){
+            tm.place(b[0],j,tile);
+        }
+    }
+
+
 
     // Adding Players
     Director.add_player({
@@ -262,6 +281,7 @@ function _beginning_of_turn(){
 function _end_of_turn(){
 
 }
+
 
 function draw_cards(){
     var html = ""
