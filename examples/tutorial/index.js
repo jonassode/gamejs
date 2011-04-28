@@ -1,4 +1,3 @@
-
 // Namespace
 var Index = {
     screen: null,
@@ -48,3 +47,4 @@ window.onload = function () {
 function _log(msg) {
     $('#log').val(msg+"\n"+$('#log').val());
 }
+

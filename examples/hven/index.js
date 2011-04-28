@@ -28,6 +28,10 @@ function _player_class( attributes ){
         return this.resources.splice(0, 1)[0];
     }
 
+    this.kill_resource = function(){
+        return this.resources.splice(0, 1)[0];
+    }
+
 }
 
 function _director_class( ){
@@ -203,8 +207,6 @@ window.onload = function () {
         }
     }
 
-
-
     // Adding Players
     Director.add_player({
         name:"Jonas"
@@ -218,36 +220,47 @@ window.onload = function () {
 
     // Library
     Index.library = new Library;
-    var town_card = new Resource({
+    var grass_card = new Resource({
         type:"card",
-        image:"town.gif",
-        name:"Town"
+        image:"grass.png",
+        name:"Grass"
     })
-    var tree_card = new Resource({
+    var road_card = new Resource({
         type:"card",
-        image:"tree.gif",
-        name:"Tree"
+        image:"road.png",
+        name:"Road"
     })
-    var farmer_card = new Resource({
+    var road_up_card = new Resource({
         type:"card",
-        image:"man.gif",
-        name:"Farmer"
+        image:"road_up.png",
+        name:"Road"
     })
-    var water_card = new Resource({
+    var road_corner_card = new Resource({
         type:"card",
-        image:"water.gif",
-        name:"Water"
+        image:"road_corner.png",
+        name:"Road"
     })
-    var observatory_card = new Resource({
+    var road_cross_card = new Resource({
         type:"card",
-        image:"observatory.gif",
-        name:"Observatory"
+        image:"road_cross.png",
+        name:"Road"
     })
-    Index.library.add_resource(town_card, 3)
-    Index.library.add_resource(tree_card, 3)
-    Index.library.add_resource(farmer_card, 3)
-    Index.library.add_resource(water_card, 3)
-    Index.library.add_resource(observatory_card, 1)
+    var town_south_card = new Resource({
+        type:"card",
+        image:"town_south.png",
+        name:"Road"
+    })
+    //Index.library.add_resource(town_card, 3)
+    //Index.library.add_resource(tree_card, 3)
+    //Index.library.add_resource(farmer_card, 3)
+    //Index.library.add_resource(water_card, 3)
+    //Index.library.add_resource(observatory_card, 1)
+    Index.library.add_resource(grass_card, 25)
+    Index.library.add_resource(road_card, 26)
+    Index.library.add_resource(road_up_card, 20)
+    Index.library.add_resource(road_corner_card, 20)
+    Index.library.add_resource(road_cross_card, 20)
+    Index.library.add_resource(town_south_card, 15)
 
     _load(Index.screen);
     Director.start_game();
@@ -271,7 +284,7 @@ function _beginning_of_turn(){
     var card = Index.library.pop();
     if(card != undefined){
         Director.current_player.add_resource(card);
-        alert(Director.current_player.name + ' drew ' + card.name);
+//        alert(Director.current_player.name + ' drew ' + card.name);
     }
     Index.selected_tile = null;
     draw_cards();
@@ -284,13 +297,13 @@ function _end_of_turn(){
 
 
 function draw_cards(){
-    var html = ""
-    for(var i=0;i<Index.library.length();i++){
-        html = html + '<img src="images/' +Index.library.item(i).image + '" >' + '<br>';
-    }
-
-    $('#cards').html(html)
-//    $('#cards').html(Index.library.length())
+//    var html = ""
+//    for(var i=0;i<Index.library.length();i++){
+//        html = html + '<img src="images/' +Index.library.item(i).image + '" >' + '<br>';
+//    }
+//
+//    $('#cards').html(html)
+    $('#cards').html(Index.library.length())
 }
 
 function draw_player_cards(){
