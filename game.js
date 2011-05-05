@@ -142,6 +142,13 @@ function _node_class( attributes ){
     this.width = (attributes.width || null);
     this.height = (attributes.height || null);
     this.color = (attributes.color || '#000');
+    this.interfaces = []
+    if (attributes.interfaces != null){
+        for(var i=0;i<attributes.interfaces.length;i++){
+            this.interfaces[this.interfaces.length] = new Interface(attributes.interfaces[i]);
+            this.interfaces[this.interfaces.length-1].parent = this;
+        }
+    }
     if (attributes.walkable != null){
         this.walkable = attributes.walkable;
     } else {
@@ -200,6 +207,18 @@ function _node_class( attributes ){
                 this.tilemap.draw();
             }
         }
+    }
+
+    this.intf = function(direction){
+        var intf = null;
+        if(this.interfaces != null){
+            for(var i=0;i<this.interfaces.length;i++){
+                if (this.interfaces[i].direction == direction){
+                    intf = this.interfaces[i];
+                }
+            }
+        }
+        return intf;
     }
 
     this.onclick = function(onclick_function){
@@ -402,6 +421,11 @@ function _tilemap_class( attributes ){
         tile.col = col;
         tile.tilemap = this;
         tile.type = 'tile';
+        // Update Interfaces
+        for(var i=0;i<tile.interfaces.length;i++){
+            tile.interfaces[i] = jQuery.extend(true, {}, tile.interfaces[i]);
+            tile.interfaces[i].parent = tile;
+        }
         this.tiles[row][col] = tile;
         return tile;
     }
@@ -412,6 +436,11 @@ function _tilemap_class( attributes ){
         background.col = col;
         background.type = 'background';
         background.tilemap = this;
+        // Update Interfaces
+        for(var i=0;i<background.interfaces.length;i++){
+            background.interfaces[i] = jQuery.extend(true, {}, background.interfaces[i]);
+            background.interfaces[i].parent = background;
+        }
         this.backgrounds[row][col] = background;
         if(background.onclick_event != null){
             this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = background;
@@ -426,6 +455,11 @@ function _tilemap_class( attributes ){
         background.col = col;
         background.type = 'background';
         background.tilemap = this;
+        // Update Interfaces
+        for(var i=0;i<background.interfaces.length;i++){
+            background.interfaces[i] = jQuery.extend(true, {}, background.interfaces[i]);
+            background.interfaces[i].parent = background;
+        }
         this.backgrounds[row][col] = background;
         return background;
     }
@@ -460,7 +494,6 @@ function _tilemap_class( attributes ){
             }
         }
     }
-
 }
 
 // Builders
@@ -529,6 +562,12 @@ function _load(screen){
         y: 20
     });
     _update_loading_screen();
+}
+
+function Preload(filepath){
+    var image = new Image();
+    image.src = filepath;
+    _images[_images.length] = image;
 }
 
 function _update_loading_screen(){

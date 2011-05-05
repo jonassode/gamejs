@@ -141,13 +141,82 @@ function Library(){
     }
 }
 
+// Hardcoded right now but should be based on Board Type (square, hex, node)
+function getDirBasedOnDirection(direction){
+    var hash = {};
+    hash["W"] = "E";
+    hash["E"] = "W";
+    hash["N"] = "S";
+    hash["S"] = "N";
+    return hash[direction];
+}
+
+// Hardcoded right now but should be based on Board Type (square, hex, node)
+function getRowBasedOnDirection(direction){
+    var hash = {};
+    hash["W"] = 0;
+    hash["E"] = 0;
+    hash["N"] = -1;
+    hash["S"] = 1;
+    return hash[direction];
+}
+
+// Hardcoded right now but should be based on Board Type (square, hex, node)
+function getColBasedOnDirection(direction){
+    var hash = {};
+    hash["W"] = -1;
+    hash["E"] = 1;
+    hash["N"] = 0;
+    hash["S"] = 0;
+    return hash[direction];
+}
+
+function Interface( attributes ){
+    this.type = (attributes.type || null);
+    this.parent = (attributes.parent || null);
+    this.direction = (attributes.direction || null);
+
+    // Should return the interface of the connected node
+    this.link = function(){
+
+        var x = this.parent.row + getRowBasedOnDirection(this.direction);
+        var y = this.parent.col + getColBasedOnDirection(this.direction);
+        var o = getDirBasedOnDirection(this.direction);
+        if ( this.parent.board.tiles[x][y] != null){
+            return this.parent.board.tiles[x][y].intf(o);
+        } else {
+            return null;
+        }
+    }
+    
+}
+
 function Resource( attributes ){
     this.type = (attributes.type || "stuff");
     this.image = (attributes.image || "");
     this.name = (attributes.name || "stuff");
+    this.interfaces = (attributes.interfaces || null);
 
     this.onclick = function(onclick_function){
 
+    }
+    this.interfaces = []
+    if (attributes.interfaces != null){
+        for(var i=0;i<attributes.interfaces.length;i++){
+            this.interfaces[this.interfaces.length] = new Interface(attributes.interfaces[i]);
+            this.interfaces[this.interfaces.length-1].parent = this;
+        }
+    }
+    this.intf = function(direction){
+        var intf = null;
+        if(this.interfaces != null){
+            for(var i=0;i<this.interfaces.length;i++){
+                if (this.interfaces[i].direction == direction){
+                    intf = this.interfaces[i];
+                }
+            }
+        }
+        return intf;
     }
 
 }
@@ -158,7 +227,8 @@ var Director = new _director_class();
 var Index = {
     screen: null,
     library: null,
-    selected_tile: null
+    selected_tile: null,
+    board:null
 };
 
 // Init
@@ -181,15 +251,30 @@ window.onload = function () {
         cols:17,
         rows:16
     });
-
+    Index.board = tm;
     var tile = new _node_class({
-        });
-    tile.layer = ltm
+        interfaces:[{
+            type:"empty",
+            direction:"N"
+        },{
+            type:"empty",
+            direction:"E"
+        },{
+            type:"empty",
+            direction:"S"
+        },{
+            type:"empty",
+            direction:"W"
+        }]
+    });
+    tile.board = tm;
+    tile.layer = ltm;
     tile.onclick(function(){
-        if(Index.selected_tile != null && this.occupied != true){
+        if(Index.selected_tile != null && this.occupied != true && this.status == "legal"){
             tm.tile(this.row, this.col, {
                 img:'images/'+Index.selected_tile.image
-            });
+                
+            }).interfaces=Index.selected_tile.interfaces;
             tm.draw();
             Index.selected_tile = null;
             Director.current_player.pop_resource();
@@ -223,32 +308,110 @@ window.onload = function () {
     var grass_card = new Resource({
         type:"card",
         image:"grass.png",
-        name:"Grass"
+        name:"Grass",
+        interfaces: [{
+            type:"grass",
+            direction:"N"
+        },{
+            type:"grass",
+            direction:"E"
+        },{
+            type:"grass",
+            direction:"S"
+        },{
+            type:"grass",
+            direction:"W"
+        }]
     })
     var road_card = new Resource({
         type:"card",
         image:"road.png",
-        name:"Road"
+        name:"Road",
+        interfaces: [{
+            type:"grass",
+            direction:"N"
+        },{
+            type:"road",
+            direction:"E"
+        },{
+            type:"grass",
+            direction:"S"
+        },{
+            type:"road",
+            direction:"W"
+        }]
     })
     var road_up_card = new Resource({
         type:"card",
         image:"road_up.png",
-        name:"Road"
+        name:"Road",
+        interfaces: [{
+            type:"road",
+            direction:"N"
+        },{
+            type:"grass",
+            direction:"E"
+        },{
+            type:"road",
+            direction:"S"
+        },{
+            type:"grass",
+            direction:"W"
+        }]
     })
     var road_corner_card = new Resource({
         type:"card",
         image:"road_corner.png",
-        name:"Road"
+        name:"Road",
+        interfaces: [{
+            type:"road",
+            direction:"N"
+        },{
+            type:"road",
+            direction:"E"
+        },{
+            type:"grass",
+            direction:"S"
+        },{
+            type:"grass",
+            direction:"W"
+        }]
     })
     var road_cross_card = new Resource({
         type:"card",
         image:"road_cross.png",
-        name:"Road"
+        name:"Road",
+        interfaces: [{
+            type:"road",
+            direction:"N"
+        },{
+            type:"road",
+            direction:"E"
+        },{
+            type:"road",
+            direction:"S"
+        },{
+            type:"road",
+            direction:"W"
+        }]
     })
     var town_south_card = new Resource({
         type:"card",
         image:"town_south.png",
-        name:"Road"
+        name:"Road",
+        interfaces: [{
+            type:"town",
+            direction:"N"
+        },{
+            type:"grass",
+            direction:"E"
+        },{
+            type:"road",
+            direction:"S"
+        },{
+            type:"grass",
+            direction:"W"
+        }]
     })
     //Index.library.add_resource(town_card, 3)
     //Index.library.add_resource(tree_card, 3)
@@ -262,6 +425,10 @@ window.onload = function () {
     Index.library.add_resource(road_cross_card, 20)
     Index.library.add_resource(town_south_card, 15)
 
+    // Preloading Images
+    Preload('images/canplacehere.png');
+    Preload('images/cannotplacehere.png')
+
     _load(Index.screen);
     Director.start_game();
 };
@@ -271,7 +438,7 @@ window.onload = function () {
 
 // Override Methods
 function _log(msg) {
-//    $('#log').val(msg+"\n"+$('#log').val());
+    $('#log').val(msg+"\n"+$('#log').val());
 }
 
 function _start_game(){
@@ -284,7 +451,7 @@ function _beginning_of_turn(){
     var card = Index.library.pop();
     if(card != undefined){
         Director.current_player.add_resource(card);
-//        alert(Director.current_player.name + ' drew ' + card.name);
+    //        alert(Director.current_player.name + ' drew ' + card.name);
     }
     Index.selected_tile = null;
     draw_cards();
@@ -297,13 +464,57 @@ function _end_of_turn(){
 
 
 function draw_cards(){
-//    var html = ""
-//    for(var i=0;i<Index.library.length();i++){
-//        html = html + '<img src="images/' +Index.library.item(i).image + '" >' + '<br>';
-//    }
-//
-//    $('#cards').html(html)
+    //    var html = ""
+    //    for(var i=0;i<Index.library.length();i++){
+    //        html = html + '<img src="images/' +Index.library.item(i).image + '" >' + '<br>';
+    //    }
+    //
+    //    $('#cards').html(html)
     $('#cards').html(Index.library.length())
+}
+
+function calculate_places(){
+    var canPlaceTileHere = true;
+    var u;
+    var ump;
+    for(var i=0;i<Index.board.backgrounds.length;i++){
+        for(var j=0;j<Index.board.backgrounds[i].length;j++){
+            if(Index.board.backgrounds[i][j] != null){
+                canPlaceTileHere = true;
+                var tile = Index.board.backgrounds[i][j];
+                if (tile.occupied != true){
+                    for(var ii=0;ii<tile.interfaces.length;ii++){
+                        var a = tile.interfaces[ii];
+                        u = a.link();
+                        if ( u != null ){
+                            if ( u.type != Index.selected_tile.intf(getDirBasedOnDirection(u.direction)).type){
+                                canPlaceTileHere = false; 
+                            }
+                        }
+                    }
+
+                    if ( canPlaceTileHere == true ){
+                        var img = new Image();
+                        img.src = 'images/canplacehere.png'
+
+                        Index.board.backgrounds[i][j].image = img
+                        Index.board.backgrounds[i][j].status = "legal"
+                    } else {
+                        var img = new Image();
+                        img.src = 'images/cannotplacehere.png'
+                        
+                        Index.board.backgrounds[i][j].image = img
+                        Index.board.backgrounds[i][j].status = "illegal"
+
+                    }
+
+                }
+            }
+        }
+    }
+    Index.board.draw();
+//alert(u);
+    
 }
 
 function draw_player_cards(){
@@ -311,7 +522,7 @@ function draw_player_cards(){
     var player_cards = Director.current_player.get_resources("card");
     for(var i=0;i<player_cards.length;i++){
         var card = player_cards[i];
-        html = html + '<img src="images/' + card.image + '" onclick="Index.selected_tile = Director.current_player.get_resources(\'card\')['+i+'];">' + '<br>';
+        html = html + '<img src="images/' + card.image + '" onclick="Index.selected_tile = Director.current_player.get_resources(\'card\')['+i+'];calculate_places();">' + '<br>';
     }
 
     $('#player_cards').html(html)
