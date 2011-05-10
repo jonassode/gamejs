@@ -131,9 +131,13 @@ function Library(){
     }
 
     this.shuffle = function(){
-        this.list.sort(function() {
-            return 0.5 - Math.random()
-        });
+        for(var i=0;i<this.list.length;i++){
+            var randomnumber=Math.floor(Math.random()*this.list.length)
+            var temp
+            temp = this.list[i]
+            this.list[i] = this.list[randomnumber]
+            this.list[randomnumber] = temp
+        }
     }
 
     this.pop = function(){
@@ -254,16 +258,12 @@ window.onload = function () {
     Index.board = tm;
     var tile = new _node_class({
         interfaces:[{
-            type:"empty",
             direction:"N"
         },{
-            type:"empty",
             direction:"E"
         },{
-            type:"empty",
             direction:"S"
         },{
-            type:"empty",
             direction:"W"
         }]
     });
@@ -413,11 +413,6 @@ window.onload = function () {
             direction:"W"
         }]
     })
-    //Index.library.add_resource(town_card, 3)
-    //Index.library.add_resource(tree_card, 3)
-    //Index.library.add_resource(farmer_card, 3)
-    //Index.library.add_resource(water_card, 3)
-    //Index.library.add_resource(observatory_card, 1)
     Index.library.add_resource(grass_card, 25)
     Index.library.add_resource(road_card, 26)
     Index.library.add_resource(road_up_card, 20)
@@ -428,6 +423,13 @@ window.onload = function () {
     // Preloading Images
     Preload('images/canplacehere.png');
     Preload('images/cannotplacehere.png')
+    Preload('images/grass.png')
+    Preload('images/road.png')
+    Preload('images/road_up.png')
+    Preload('images/road_cross.png')
+    Preload('images/road_corner.png')
+    Preload('images/town_south.png')
+
 
     _load(Index.screen);
     Director.start_game();
@@ -451,7 +453,6 @@ function _beginning_of_turn(){
     var card = Index.library.pop();
     if(card != undefined){
         Director.current_player.add_resource(card);
-    //        alert(Director.current_player.name + ' drew ' + card.name);
     }
     Index.selected_tile = null;
     draw_cards();
@@ -476,7 +477,6 @@ function draw_cards(){
 function calculate_places(){
     var canPlaceTileHere = true;
     var u;
-    var ump;
     for(var i=0;i<Index.board.backgrounds.length;i++){
         for(var j=0;j<Index.board.backgrounds[i].length;j++){
             if(Index.board.backgrounds[i][j] != null){
@@ -493,14 +493,13 @@ function calculate_places(){
                         }
                     }
 
+                    var img = new Image();
                     if ( canPlaceTileHere == true ){
-                        var img = new Image();
                         img.src = 'images/canplacehere.png'
 
                         Index.board.backgrounds[i][j].image = img
                         Index.board.backgrounds[i][j].status = "legal"
                     } else {
-                        var img = new Image();
                         img.src = 'images/cannotplacehere.png'
                         
                         Index.board.backgrounds[i][j].image = img
@@ -513,7 +512,6 @@ function calculate_places(){
         }
     }
     Index.board.draw();
-//alert(u);
     
 }
 
