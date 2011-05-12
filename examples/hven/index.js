@@ -201,9 +201,6 @@ function Resource( attributes ){
     this.name = (attributes.name || "stuff");
     this.interfaces = (attributes.interfaces || null);
 
-    this.onclick = function(onclick_function){
-
-    }
     this.interfaces = []
     if (attributes.interfaces != null){
         for(var i=0;i<attributes.interfaces.length;i++){
@@ -256,39 +253,41 @@ window.onload = function () {
         rows:16
     });
     Index.board = tm;
-    var tile = new _node_class({
-        interfaces:[{
-            direction:"N"
-        },{
-            direction:"E"
-        },{
-            direction:"S"
-        },{
-            direction:"W"
-        }]
-    });
-    tile.board = tm;
-    tile.layer = ltm;
-    tile.onclick(function(){
+    Index.bg = lb;
+
+    var interfaces = [{
+        direction:"N"
+    },{
+        direction:"E"
+    },{
+        direction:"S"
+    },{
+        direction:"W"
+    }];
+    var click = function(){
         if(Index.selected_tile != null && this.occupied != true && this.status == "legal"){
             tm.tile(this.row, this.col, {
                 img:'images/'+Index.selected_tile.image
-                
             }).interfaces=Index.selected_tile.interfaces;
-            tm.draw();
             Index.selected_tile = null;
             Director.current_player.pop_resource();
             draw_player_cards();
             this.occupied = true;
+            tm.all("image",null);
+            Index.bg.draw();
+            tm.draw();
         }
-    });
+    };
 
     var a = [[1,1,8],[2,1,10],[3,1,11],[4,2,12],[5,2,13],[6,4,15],[7,5,15],[8,6,15],[9,6,14],[10,7,14],[11,8,14],[12,9,14],[13,9,14],[14,9,13]]
 
     for(var i=0;i<a.length;i++){
         var b=a[i];
         for(var j=b[1];j<=b[2];j++){
-            tm.place(b[0],j,tile);
+            tm.background(b[0],j).active = true;
+            tm.background(b[0],j).onclick(click);
+            tm.background(b[0],j).board = tm;
+            tm.background(b[0],j).setInterfaces(interfaces);
         }
     }
 
@@ -421,7 +420,6 @@ window.onload = function () {
     Index.library.add_resource(town_south_card, 15)
 
     // Preloading Images
-    Preload('images/canplacehere.png');
     Preload('images/cannotplacehere.png')
     Preload('images/grass.png')
     Preload('images/road.png')
@@ -429,7 +427,6 @@ window.onload = function () {
     Preload('images/road_cross.png')
     Preload('images/road_corner.png')
     Preload('images/town_south.png')
-
 
     _load(Index.screen);
     Director.start_game();
@@ -477,11 +474,11 @@ function draw_cards(){
 function calculate_places(){
     var canPlaceTileHere = true;
     var u;
-    for(var i=0;i<Index.board.backgrounds.length;i++){
-        for(var j=0;j<Index.board.backgrounds[i].length;j++){
-            if(Index.board.backgrounds[i][j] != null){
+    for(var i=0;i<Index.board.rows;i++){
+        for(var j=0;j<Index.board.cols;j++){
+            if(Index.board.background(i,j).active == true){
                 canPlaceTileHere = true;
-                var tile = Index.board.backgrounds[i][j];
+                var tile = Index.board.background(i,j);
                 if (tile.occupied != true){
                     for(var ii=0;ii<tile.interfaces.length;ii++){
                         var a = tile.interfaces[ii];
@@ -493,17 +490,16 @@ function calculate_places(){
                         }
                     }
 
-                    var img = new Image();
                     if ( canPlaceTileHere == true ){
-                        img.src = 'images/canplacehere.png'
 
-                        Index.board.backgrounds[i][j].image = img
-                        Index.board.backgrounds[i][j].status = "legal"
+                        Index.board.background(i,j).image = null
+                        Index.board.background(i,j).status = "legal"
                     } else {
+                        var img = new Image();
                         img.src = 'images/cannotplacehere.png'
                         
-                        Index.board.backgrounds[i][j].image = img
-                        Index.board.backgrounds[i][j].status = "illegal"
+                        Index.board.background(i,j).image = img
+                        Index.board.background(i,j).status = "illegal"
 
                     }
 
@@ -511,8 +507,20 @@ function calculate_places(){
             }
         }
     }
+    Index.bg.draw();
     Index.board.draw();
     
+}
+
+function click_active_card( i ){
+    Index.selected_tile = Director.current_player.get_resources('card')[i];
+    calculate_places();
+    var player_cards = Director.current_player.get_resources("card");
+    for(var j=0;j<player_cards.length;j++){
+        $("#card"+j).removeClass("active");
+    }
+
+    $("#card"+i).addClass("active");
 }
 
 function draw_player_cards(){
@@ -520,7 +528,7 @@ function draw_player_cards(){
     var player_cards = Director.current_player.get_resources("card");
     for(var i=0;i<player_cards.length;i++){
         var card = player_cards[i];
-        html = html + '<img src="images/' + card.image + '" onclick="Index.selected_tile = Director.current_player.get_resources(\'card\')['+i+'];calculate_places();">' + '<br>';
+        html = html + '<img id="card'+i+'" class="inactive"src="images/' + card.image + '" onclick="click_active_card('+i+');">' + '<br>';
     }
 
     $('#player_cards').html(html)

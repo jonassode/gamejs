@@ -13,3 +13,10 @@ body
     src: url('kulminoituva.ttf');
 }
 
+.inactive {
+    border: 2px solid lightblue;
+}
+
+.active {
+    border: 2px solid black;
+}

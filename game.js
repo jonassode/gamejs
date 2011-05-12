@@ -118,6 +118,8 @@ function _layer_class( layer_name ){
     this.tilemap = function ( attributes ){
         var tm = new _tilemap_class( attributes );
         tm.layer = this;
+        tm.all('layer',this);
+        tm.all('type','background');
         this.tilemaps[this.tilemaps.length] = tm;
         return tm;
     };
@@ -155,6 +157,13 @@ function _node_class( attributes ){
         this.walkable = true;
     }
 
+    this.setInterfaces = function(interfaces){
+        for(var i=0;i<interfaces.length;i++){
+            this.interfaces[i] = new Interface(interfaces[i]);
+            this.interfaces[i].parent = this;
+        }
+    }
+
     // Draws the node on canvas
     // Returns self-reference
     this.draw = function (){
@@ -170,6 +179,10 @@ function _node_class( attributes ){
         }
         return this;
     };
+
+    this.set = function(attribute, value){
+        this[attribute] = value;
+    }
 
     // Movement
     this.move = function(direction){
@@ -412,6 +425,21 @@ function _tilemap_class( attributes ){
     this.backgrounds = new Array(this.rows);
     for (row = 0; row < this.rows; row++) {
         this.backgrounds[row] = new Array(this.cols);
+        // Place a Tile on Each Background Board
+        for (col = 0; col < this.cols; col++) {
+            this.backgrounds[row][col] = new _node_class({});
+            this.backgrounds[row][col].row = row;
+            this.backgrounds[row][col].col = col;
+
+        }
+    }
+
+    this.all = function(attribute, value){
+        for (row = 0; row < this.rows; row++) {
+            for (col = 0; col < this.cols; col++) {
+                this.backgrounds[row][col][attribute] = value;
+            }
+        }
     }
 
     this.tile = function(row, col, attributes ){
@@ -493,6 +521,10 @@ function _tilemap_class( attributes ){
                 this.background(row, col, attributes);
             }
         }
+    }
+
+    this.background = function(i, j){
+        return this.backgrounds[i][j];
     }
 }
 
