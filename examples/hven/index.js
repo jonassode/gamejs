@@ -265,18 +265,7 @@ window.onload = function () {
         direction:"W"
     }];
     var click = function(){
-        if(Index.selected_tile != null && this.occupied != true && this.status == "legal"){
-            tm.tile(this.row, this.col, {
-                img:'images/'+Index.selected_tile.image
-            }).interfaces=Index.selected_tile.interfaces;
-            Index.selected_tile = null;
-            Director.current_player.pop_resource();
-            draw_player_cards();
-            this.occupied = true;
-            tm.all("image",null);
-            Index.bg.draw();
-            tm.draw();
-        }
+        place_tile(this)
     };
 
     var a = [[1,1,8],[2,1,10],[3,1,11],[4,2,12],[5,2,13],[6,4,15],[7,5,15],[8,6,15],[9,6,14],[10,7,14],[11,8,14],[12,9,14],[13,9,14],[14,9,13]]
@@ -432,8 +421,6 @@ window.onload = function () {
     Director.start_game();
 };
 
-// Build Tileset
-
 
 // Override Methods
 function _log(msg) {
@@ -457,19 +444,45 @@ function _beginning_of_turn(){
 }
 
 function _end_of_turn(){
-
+    save_tile_placement()
 }
 
-
+// Game Functions
 function draw_cards(){
-    //    var html = ""
-    //    for(var i=0;i<Index.library.length();i++){
-    //        html = html + '<img src="images/' +Index.library.item(i).image + '" >' + '<br>';
-    //    }
-    //
-    //    $('#cards').html(html)
     $('#cards').html(Index.library.length())
 }
+
+function place_tile(tile){
+    if(Index.selected_tile != null && tile.occupied != true && tile.status == "legal"){
+        if(Index.tileplace != null){
+            Index.board.tiles[Index.tileplace.row][Index.tileplace.col] = null;
+        }
+        Index.board.tile(tile.row, tile.col, {
+            img:'images/'+Index.selected_tile.image
+        }).interfaces=Index.selected_tile.interfaces;
+        Index.tileplace = tile
+        Index.bg.draw();
+        Index.board.draw();
+
+    }    
+}
+
+function save_tile_placement(){
+    if(Index.tileplace != null){
+
+        tile = Index.tileplace;
+        Index.selected_tile = null;
+        Director.current_player.pop_resource();
+        draw_player_cards();
+        tile.occupied = true;
+        Index.board.all("image",null);
+        Index.bg.draw();
+        Index.board.draw();
+        
+        Index.tileplace = null;
+    }
+}
+
 
 function calculate_places(){
     var canPlaceTileHere = true;
@@ -513,6 +526,11 @@ function calculate_places(){
 }
 
 function click_active_card( i ){
+    if(Index.tileplace != null){
+        Index.board.tiles[Index.tileplace.row][Index.tileplace.col] = null;
+    }
+    Index.tileplace = null
+
     Index.selected_tile = Director.current_player.get_resources('card')[i];
     calculate_places();
     var player_cards = Director.current_player.get_resources("card");
@@ -534,5 +552,12 @@ function draw_player_cards(){
     $('#player_cards').html(html)
 }
 
+function place_tile_and_end_turn(){
+    if(Index.tileplace == null){
+        alert('You must place a tile befor you end your turn.')
+    } else {
+        Director.end_turn();
+    }
+}
 
 
