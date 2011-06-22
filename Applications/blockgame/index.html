@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>The Block Game</title>
+        <link rel="stylesheet" href="index.css">
+        <script src="jquery.js"></script>
+        <script src="../../game.js"></script>
+        <script src="index.js"></script>
+    </head>
+    <body>
+        <center>
+            <table>
+                <tr>
+                    <td>
+                        <canvas id="block_canvas" width="330" height="480" ></canvas><br>
+                        
+                    </td>
+                    <td valign="top">
+                        <b>Player List</b>
+                        <div id="player_list""></div><br>
+                        <button onclick='place_tile_and_end_turn();'>End Turn</button><br>
+                        <br>
+                        <textarea id="log" rows="10"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </center>
+    </body>
+</html>
+

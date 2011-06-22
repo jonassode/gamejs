@@ -23,7 +23,7 @@ var letters = {};
 
 for (var counter = 0;counter < alphabet.length ;counter++ ) {
     letters[alphabet[counter]] = new Image();
-    letters[alphabet[counter]].src = gamejs_folder + "images/"+alphabet[counter]+".gif";
+    letters[alphabet[counter]].src = gamejs_folder + "Images/"+alphabet[counter]+".gif";
     _images[_images.length] = letters[alphabet[counter]];
 }
 
@@ -45,7 +45,245 @@ var _right = {
     col:1
 };
 
+
 // Classes
+// Classes
+// Will be moved to game.js later
+function _player_class( attributes ){
+    this.name = (attributes.name || "guest");
+    this.status = "ACTIVE"
+    this.resources = new Array();
+
+    this.add_resource = function(resource){
+        this.resources[this.resources.length] = jQuery.extend(true, {}, resource);
+    }
+
+    this.kill = function(){
+        this.status = "INACTIVE"
+    }
+
+    this.get_resources = function( type ){
+        var a = new Array
+        for(var r in this.resources)
+        {
+            if (this.resources[r].type == type ){
+                a[a.length] = this.resources[r];
+            }
+        }
+        return a
+    }
+
+    this.pop_resource = function(){
+        return this.resources.splice(0, 1)[0];
+    }
+
+    this.kill_resource = function(){
+        return this.resources.splice(0, 1)[0];
+    }
+
+}
+
+function _director_class( ){
+    this.players = new Array();
+    this.current_player = null;
+
+    this.add_player = function( attributes ){
+        var p = new _player_class( attributes );
+
+        this.players[this.players.length] = p;
+
+        if (this.current_player == null){
+            this.current_player = p;
+        }
+        
+        return p
+    }
+
+    this.draw_player_list = function(){
+        var html = ""
+        for(var p in this.players)
+        {
+            if(this.players[p].name == this.current_player.name){
+                html = html + "* "
+            }
+            html = html + this.players[p].name + "<br>";
+        }
+        $('#player_list').html(html)
+
+    }
+
+    this.end_turn = function(){
+        // End Of Turn Moves
+        _end_of_turn();
+        // Change To Next Player
+        for(var p in this.players)
+        {
+            if(this.players[p].name == this.current_player.name){
+                var next_player = parseInt(p)+1; 
+                if(next_player < this.players.length){
+                    this.current_player = this.players[next_player]
+                }else{
+                    this.current_player = this.players[0]
+                }
+                break
+            }
+        }
+        this.draw_player_list();
+        // Beginning Of Turn Moves
+        _beginning_of_turn();
+
+    }
+
+    this.start_game = function(){
+        this.draw_player_list();
+        _start_game();
+        _beginning_of_turn();
+    }
+
+    this.player = function(name){
+        for(var p in this.players)
+        {
+            if(this.players[p].name == name){
+                return this.players[p];
+                break;
+            }
+        }
+    }
+
+}
+
+function _end_of_turn(){
+// Does Nothing
+// Player Can Override This
+}
+
+function _start_game(){
+// Does Nothing
+// Player Can Override This
+}
+function Library(){
+    this.list = new Array();
+
+    this.length = function(){
+        return this.list.length;
+    }
+
+    this.add_resource = function(resource, amount){
+        for (i=0;i<amount;i++)
+        {
+            this.list[this.list.length] = jQuery.extend(true, {}, resource);
+        }
+
+    }
+
+    this.item = function( i ){
+        return this.list[i]
+    }
+
+    this.shuffle = function(){
+        for(var i=0;i<this.list.length;i++){
+            var randomnumber=Math.floor(Math.random()*this.list.length)
+            var temp
+            temp = this.list[i]
+            this.list[i] = this.list[randomnumber]
+            this.list[randomnumber] = temp
+        }
+    }
+
+    this.pop = function(){
+        return this.list.splice(0, 1)[0];
+    }
+}
+
+// Hardcoded right now but should be based on Board Type (square, hex, node)
+function getDirBasedOnDirection(direction){
+    var hash = {};
+    hash["W"] = "E";
+    hash["E"] = "W";
+    hash["N"] = "S";
+    hash["S"] = "N";
+    return hash[direction];
+}
+
+// Hardcoded right now but should be based on Board Type (square, hex, node)
+function getRowBasedOnDirection(direction){
+    var hash = {};
+    hash["W"] = 0;
+    hash["E"] = 0;
+    hash["N"] = -1;
+    hash["S"] = 1;
+    return hash[direction];
+}
+
+// Hardcoded right now but should be based on Board Type (square, hex, node)
+function getColBasedOnDirection(direction){
+    var hash = {};
+    hash["W"] = -1;
+    hash["E"] = 1;
+    hash["N"] = 0;
+    hash["S"] = 0;
+    return hash[direction];
+}
+
+function Interface( attributes ){
+    this.type = (attributes.type || null);
+    this.parent = (attributes.parent || null);
+    this.direction = (attributes.direction || null);
+
+    // Should return the interface of the connected node
+    this.tile_interface = function(){
+
+        var x = this.parent.row + getRowBasedOnDirection(this.direction);
+        var y = this.parent.col + getColBasedOnDirection(this.direction);
+        var o = getDirBasedOnDirection(this.direction);
+        if ( this.parent.tilemap.tiles[x] != null && this.parent.tilemap.tiles[x][y] != null){
+            return this.parent.tilemap.tiles[x][y].intf(o);
+        } else {
+            return null;
+        }
+    }
+
+    this.background = function(){
+
+        var x = this.parent.row + getRowBasedOnDirection(this.direction);
+        var y = this.parent.col + getColBasedOnDirection(this.direction);
+        if ( this.parent.tilemap.backgrounds[x] != null && this.parent.tilemap.backgrounds[x][y] != null){
+            return this.parent.tilemap.backgrounds[x][y];
+        } else {
+            return null;
+        }
+    }
+
+
+}
+
+function Resource( attributes ){
+    this.type = (attributes.type || "stuff");
+    this.image = (attributes.image || "");
+    this.name = (attributes.name || "stuff");
+    this.interfaces = (attributes.interfaces || null);
+
+    this.interfaces = []
+    if (attributes.interfaces != null){
+        for(var i=0;i<attributes.interfaces.length;i++){
+            this.interfaces[this.interfaces.length] = new Interface(attributes.interfaces[i]);
+            this.interfaces[this.interfaces.length-1].parent = this;
+        }
+    }
+    this.intf = function(direction){
+        var intf = null;
+        if(this.interfaces != null){
+            for(var i=0;i<this.interfaces.length;i++){
+                if (this.interfaces[i].direction == direction){
+                    intf = this.interfaces[i];
+                }
+            }
+        }
+        return intf;
+    }
+
+}
+
 function _layer_class( layer_name ){
     // Attributes
     this.id = _generate_id("l");
@@ -138,6 +376,25 @@ function _node_class( attributes ){
         this.type = 'block';
     }
 
+
+    this.setInterfaces = function(interfaces){
+        for(var i=0;i<interfaces.length;i++){
+            this.interfaces[i] = new Interface(interfaces[i]);
+            this.interfaces[i].parent = this;
+        }
+    }
+
+    // Default Interfaces
+    var interfaces = [{
+        direction:"N"
+    },{
+        direction:"E"
+    },{
+        direction:"S"
+    },{
+        direction:"W"
+    }];
+
     this.onclick_event = null;
     this.x = (attributes.x || 0);
     this.y = (attributes.y || 0);
@@ -146,22 +403,14 @@ function _node_class( attributes ){
     this.color = (attributes.color || '#000');
     this.interfaces = []
     if (attributes.interfaces != null){
-        for(var i=0;i<attributes.interfaces.length;i++){
-            this.interfaces[this.interfaces.length] = new Interface(attributes.interfaces[i]);
-            this.interfaces[this.interfaces.length-1].parent = this;
-        }
+        this.setInterfaces(attributes.interfaces);
+    } else {
+        this.setInterfaces(interfaces);
     }
     if (attributes.walkable != null){
         this.walkable = attributes.walkable;
     } else {
         this.walkable = true;
-    }
-
-    this.setInterfaces = function(interfaces){
-        for(var i=0;i<interfaces.length;i++){
-            this.interfaces[i] = new Interface(interfaces[i]);
-            this.interfaces[i].parent = this;
-        }
     }
 
     // Draws the node on canvas
@@ -240,7 +489,7 @@ function _node_class( attributes ){
         // Register function for this tiles onlick event
         this.onclick_event = onclick_function;
     }
-
+    
 }
 
 function _log(msg){
@@ -422,6 +671,7 @@ function _tilemap_class( attributes ){
     for (row = 0; row < this.rows; row++) {
         this.tiles[row] = new Array(this.cols);
     }
+    
     this.backgrounds = new Array(this.rows);
     for (row = 0; row < this.rows; row++) {
         this.backgrounds[row] = new Array(this.cols);
@@ -430,6 +680,7 @@ function _tilemap_class( attributes ){
             this.backgrounds[row][col] = new _node_class({});
             this.backgrounds[row][col].row = row;
             this.backgrounds[row][col].col = col;
+            this.backgrounds[row][col].tilemap = this;
 
         }
     }
@@ -442,19 +693,40 @@ function _tilemap_class( attributes ){
         }
     }
 
+    this.move_tile = function(row, col, tile ){
+        this.tiles[tile.row][tile.col] = null
+        this.tiles[row][col] = tile;
+        tile.row = row
+        tile.col = col
+        return tile;
+    }
+
     this.tile = function(row, col, attributes ){
-        var tile = new _node_class( attributes );
-        tile.layer = this.layer;
+        var tile = this._tile( attributes );
         tile.row = row;
         tile.col = col;
         tile.tilemap = this;
+        this.tiles[row][col] = tile;
+        return tile;
+    }
+    this.place_tile = function(row, col, original_tile ){
+        var tile = jQuery.extend(true, {}, original_tile);
+        tile.row = row;
+        tile.col = col;
+        tile.tilemap = this;
+        this.tiles[row][col] = tile;
+        return tile;
+    }
+    // Create A tile object ( but does not place it on the map )
+    this._tile = function(attributes ){
+        var tile = new _node_class( attributes );
+        tile.layer = this.layer;
         tile.type = 'tile';
         // Update Interfaces
         for(var i=0;i<tile.interfaces.length;i++){
             tile.interfaces[i] = jQuery.extend(true, {}, tile.interfaces[i]);
             tile.interfaces[i].parent = tile;
         }
-        this.tiles[row][col] = tile;
         return tile;
     }
     this.place = function(row, col, tile){
