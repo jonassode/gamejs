@@ -376,7 +376,6 @@ function _node_class( attributes ){
         this.type = 'block';
     }
 
-
     this.setInterfaces = function(interfaces){
         for(var i=0;i<interfaces.length;i++){
             this.interfaces[i] = new Interface(interfaces[i]);
@@ -489,7 +488,7 @@ function _node_class( attributes ){
         // Register function for this tiles onlick event
         this.onclick_event = onclick_function;
     }
-    
+
 }
 
 function _log(msg){
@@ -693,6 +692,15 @@ function _tilemap_class( attributes ){
         }
     }
 
+    this.all_onclick = function(func){
+        for (row = 0; row < this.rows; row++) {
+            for (col = 0; col < this.cols; col++) {
+                this.backgrounds[row][col].onclick(func);
+            }
+        }
+    }
+
+    // Moves a Tile from one square to another
     this.move_tile = function(row, col, tile ){
         this.tiles[tile.row][tile.col] = null
         this.tiles[row][col] = tile;
@@ -700,7 +708,7 @@ function _tilemap_class( attributes ){
         tile.col = col
         return tile;
     }
-
+    // Creates a tile and places it on the tilemap
     this.tile = function(row, col, attributes ){
         var tile = this._tile( attributes );
         tile.row = row;
@@ -709,8 +717,10 @@ function _tilemap_class( attributes ){
         this.tiles[row][col] = tile;
         return tile;
     }
+    // Places a specified tile on the tilemap
     this.place_tile = function(row, col, original_tile ){
         var tile = jQuery.extend(true, {}, original_tile);
+        tile.id = _generate_id("n");
         tile.row = row;
         tile.col = col;
         tile.tilemap = this;
@@ -764,10 +774,24 @@ function _tilemap_class( attributes ){
         return background;
     }
 
+    this.remove = function(row, col){
+       var tile, click_obj
+       tile = this.tiles[row][col]
+       // Removing Tile From Clickable Objects
+       for( var i=0; i<tile.layer.screen.clickable_objects.length; i++){
+            if ( tile.layer.screen.clickable_objects[i].id == tile.id ){
+                tile.layer.screen.clickable_objects.splice(i, 1)
+            }
+       }
+
+       this.tiles[row][col] = null;
+       tile = null;
+       return null;
+    }
+
     this.draw = function(){
         for (var row = this.row; row < (this.visiblerows+this.row); row++) {
             for (var col = this.col; col < (this.visiblecols+this.col); col++) {
-                //var tile = this.tiles[row][col]
                 if ( this.tiles[row][col] != null){
                     this.tiles[row][col].x = ((col-this.col) * this.tilesize) + this.x;
                     this.tiles[row][col].y = ((row-this.row) * this.tilesize) + this.y;
@@ -775,7 +799,6 @@ function _tilemap_class( attributes ){
                     this.tiles[row][col].height = this.tilesize;
                     this.tiles[row][col].draw();
                 } else if (this.backgrounds[row][col] != null)  {
-                    //var bg = this.backgrounds[row][col]
                     this.backgrounds[row][col].x = ((col-this.col) * this.tilesize) + this.x;
                     this.backgrounds[row][col].y = ((row-this.row) * this.tilesize) + this.y;
                     this.backgrounds[row][col].width = this.tilesize;
@@ -797,6 +820,10 @@ function _tilemap_class( attributes ){
 
     this.background = function(i, j){
         return this.backgrounds[i][j];
+    }
+
+    this.get_tile = function(i, j){
+        return this.tiles[i][j];
     }
 }
 
