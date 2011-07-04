@@ -1,5 +1,12 @@
 require 'fileutils'
 
+puts "Checking if 'Deploys' Directory exists"
+
+if ! File.directory? 'Deploys'
+    Dir.mkdir("Deploys")
+    puts "Creating 'Deploys' Directory"
+end
+
 puts 'Deploying application ' + ARGV[0]
 
 t = Time.now()
