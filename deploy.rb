@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'fileutils'
 
 puts "Checking if 'Deploys' Directory exists"
