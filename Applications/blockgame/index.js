@@ -29,12 +29,17 @@ window.onload = function () {
     // Create Layer
     var ltm = Index.screen.layer("board");
 
+    // Tile Map
     var tm = ltm.tilemap({
         tilesize:30,
         cols:11,
-        rows:16
+        rows:16,
+        y:40
     });
     Index.board = tm;
+
+    // Text Box
+    ltm.textbox({x:0, y:0, width:47, height:4, padding:2, text:"Welcome To block game.\n\nPlayer turn: {Director.current_player.name}\nYou have: {Director.current_player.blocks} blocks left."});
 
     // Building Board Game
     var img = new Image();
@@ -61,10 +66,11 @@ window.onload = function () {
     var white = Index.board._tile({
         img:"images/white.png"
     })
+
     var move_tile = function(){
         clear_temporary_tiles();
         Index.board.move_tile(this.row, this.col, Director.current_player.tile)
-        Index.board.draw()
+        Index.screen.draw();
         Director.end_turn();
     }
 
@@ -74,12 +80,14 @@ window.onload = function () {
     })
     red_meeple.owner = red_player
     red_player.tile = red_meeple
+    red_player.blocks = 20
     
     var blue_meeple = Index.board.tile(15,5,{
         img:'images/blue_player.png'
     })
     blue_meeple.owner = blue_player
     blue_player.tile = blue_meeple
+    blue_player.blocks = 20
 
     // Register Events
     var tile_click = function(){
@@ -106,20 +114,21 @@ window.onload = function () {
                 Index.state = "NEW"
                 break;
             }
-            Index.board.draw()
+            Index.screen.draw();
         }
     }
 
-    var bg_click = function(){
-        if( Index.board.get_tile(this.row, this.col) == null && this.row != 0 && this.row != 15){
+    var place_blocker = function(){
+
+        if( Index.board.get_tile(this.row, this.col) == null && this.row != 0 && this.row != 15 && Director.current_player.blocks > 0){
             Index.board.tile(this.row, this.col,{img:'images/green.png'});
             clear_temporary_tiles();
-            Index.board.draw();
+            Director.current_player.blocks--;
             Director.end_turn();
         }
     }
 
-    Index.board.all_onclick(bg_click)
+    Index.board.all_onclick(place_blocker)
     
     red_meeple.onclick(tile_click)
     blue_meeple.onclick(tile_click)
@@ -149,6 +158,7 @@ function _start_game(){
 
 function _beginning_of_turn(){
     Index.state = "NEW"
+    Index.screen.draw();
 }
 
 function _end_of_turn(){

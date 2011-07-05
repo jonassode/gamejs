@@ -584,21 +584,39 @@ function _textbox_class( attributes ){
 
         this.layer.screen.context.fillStyle = this.color;
         this.layer.screen.context.fillRect(x, y, width, height);
+
         if (this.text != null && this.text != undefined){
 
             var words = this.text.toString().split(" ");
             for (var wi=0; wi< words.length; wi++){
                 word = words[wi];
+
+                // Evaluate Parameters
+                if(word[0] == "{"){
+                    var parameter_name = "";
+                    var temp_counter = 1;
+                    while (word[temp_counter] != "}"){
+                        parameter_name = parameter_name + word[temp_counter];
+                        temp_counter = temp_counter + 1;
+                    }
+                    word = word.replace("{"+parameter_name+"}",eval(parameter_name));
+                }
+
+                // Check if we want to move to next row
                 if(word.length+col > this.width){
                     row = row + 1;
                     col = 0;
                 }
+
+                // Print Character By Character
                 for (var counter = 0; counter < word.length; counter++ ) {
                     character = word[counter];
-                    if (character == "\n"){
+                    switch(character){
+                    case "\n":
                         row = row + 1;
                         col = 0;
-                    } else {
+                        break;
+                    default:
                         character = character.toUpperCase();
                         imgx = x + this.padding + (col * _letter_width);
                         imgy = y + this.padding + (row * _letter_height);
@@ -609,6 +627,7 @@ function _textbox_class( attributes ){
                         } else {
                             _log('Trided to write character '+character+' which is not supported.');
                         }
+                        break;
                     }
                 }
                 col = col + 1;
