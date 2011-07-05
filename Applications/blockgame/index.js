@@ -111,7 +111,7 @@ window.onload = function () {
     }
 
     var bg_click = function(){
-        if( Index.board.get_tile(this.row, this.col) == null){
+        if( Index.board.get_tile(this.row, this.col) == null && this.row != 0 && this.row != 15){
             Index.board.tile(this.row, this.col,{img:'images/green.png'});
             clear_temporary_tiles();
             Index.board.draw();
@@ -129,6 +129,7 @@ window.onload = function () {
     Preload('images/red.png')
     Preload('images/blue.png')
     Preload('images/white.png')
+    Preload('images/green.png')
     Preload('images/red_player.png')
     Preload('images/blue_player.png')
 
