@@ -139,7 +139,11 @@ function _director_class( ){
         _start_game();
         _beginning_of_turn();
     }
-
+    
+    this.end_game = function(message){
+        alert(message);
+    }
+    
     this.player = function(name){
         for(var p in this.players)
         {
@@ -161,6 +165,7 @@ function _start_game(){
 // Does Nothing
 // Player Can Override This
 }
+
 function Library(){
     this.list = new Array();
 
@@ -612,6 +617,7 @@ function _textbox_class( attributes ){
                 for (var counter = 0; counter < word.length; counter++ ) {
                     character = word[counter];
                     switch(character){
+                    // Move Down One Row on Carriage Return
                     case "\n":
                         row = row + 1;
                         col = 0;
@@ -635,7 +641,6 @@ function _textbox_class( attributes ){
         }
     }
 }
-
 
 function _tilemap_class( attributes ){
     this.id = _generate_id("tm");
@@ -937,7 +942,6 @@ function _update_loading_screen(){
         _first_screen.draw();
     }
 }
-
 
 $(document).keyup(function(event){
     var method = String.fromCharCode(event.which);

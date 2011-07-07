@@ -39,7 +39,7 @@ window.onload = function () {
     Index.board = tm;
 
     // Text Box
-    ltm.textbox({x:0, y:0, width:47, height:4, padding:2, text:"Welcome To block game.\n\nPlayer turn: {Director.current_player.name}\nYou have: {Director.current_player.blocks} blocks left."});
+    ltm.textbox({x:0, y:0, width:47, height:4, padding:2, text:"Welcome To Blockgame.\nPlayer turn: {Director.current_player.name}\nRed have: {Director.player(\"Red\").blocks} blocks left.\nBlue have: {Director.player(\"Blue\").blocks} blocks left."});
 
     // Building Board Game
     var img = new Image();
@@ -71,7 +71,11 @@ window.onload = function () {
         clear_temporary_tiles();
         Index.board.move_tile(this.row, this.col, Director.current_player.tile)
         Index.screen.draw();
-        Director.end_turn();
+        if ( check_victory() == true ) {
+            Director.end_game(Director.current_player.name + " won. Refresh Page to Play Again.")
+        } else {
+            Director.end_turn();
+        }
     }
 
     // Placing Player Tiles
@@ -81,6 +85,7 @@ window.onload = function () {
     red_meeple.owner = red_player
     red_player.tile = red_meeple
     red_player.blocks = 20
+    red_player.winning_row = 15
     
     var blue_meeple = Index.board.tile(15,5,{
         img:'images/blue_player.png'
@@ -88,6 +93,7 @@ window.onload = function () {
     blue_meeple.owner = blue_player
     blue_player.tile = blue_meeple
     blue_player.blocks = 20
+    blue_player.winning_row = 0
 
     // Register Events
     var tile_click = function(){
@@ -179,3 +185,12 @@ function clear_temporary_tiles(){
     Index.temporary_tiles = new Array()
 }
 
+function check_victory(){
+    if ( Director.current_player.tile.row == Director.current_player.winning_row ){
+        return true;
+    } else {
+        return false;
+    }
+    
+    
+}
