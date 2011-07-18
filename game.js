@@ -45,8 +45,6 @@ var _right = {
     col:1
 };
 
-
-// Classes
 // Classes
 // Will be moved to game.js later
 function _player_class( attributes ){
@@ -142,18 +140,27 @@ function _director_class( ){
     
     this.end_game = function(message){
         alert(message);
+        _end_game();
     }
     
     this.player = function(name){
+        var player = null;
+
         for(var p in this.players)
         {
             if(this.players[p].name == name){
-                return this.players[p];
+                player = this.players[p];
                 break;
             }
         }
+        return player;
     }
 
+}
+
+function _beginning_of_turn(){
+// Does Nothing
+// Player Can Override This
 }
 
 function _end_of_turn(){
@@ -162,6 +169,11 @@ function _end_of_turn(){
 }
 
 function _start_game(){
+// Does Nothing
+// Player Can Override This
+}
+
+function _end_game(){
 // Does Nothing
 // Player Can Override This
 }
@@ -372,10 +384,10 @@ function _layer_class( layer_name ){
 function _node_class( attributes ){
     this.id = _generate_id("n");
     _id_hash[this.id] = this
-    if (attributes.img != null) {
+    if (attributes.image != null) {
         this.type = 'image';
         this.image = new Image();
-        this.image.src = attributes.img;
+        this.image.src = attributes.image;
         _images[_images.length] = this.image;
     } else {
         this.type = 'block';
@@ -492,6 +504,19 @@ function _node_class( attributes ){
         this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
         // Register function for this tiles onlick event
         this.onclick_event = onclick_function;
+    }
+    
+    // Updates the Image of the Node
+    //  src: Path to image or null if you want to remove the image
+    // Usage
+    // Index.board.background(j,i).set_image('images/background.png') 
+    this.set_image = function(src){
+        if (src != null){
+            this.image = new Image();
+            this.image.src = src;
+        } else {
+            this.image = null;
+        }
     }
 
 }
@@ -617,23 +642,23 @@ function _textbox_class( attributes ){
                 for (var counter = 0; counter < word.length; counter++ ) {
                     character = word[counter];
                     switch(character){
-                    // Move Down One Row on Carriage Return
-                    case "\n":
-                        row = row + 1;
-                        col = 0;
-                        break;
-                    default:
-                        character = character.toUpperCase();
-                        imgx = x + this.padding + (col * _letter_width);
-                        imgy = y + this.padding + (row * _letter_height);
-                        img = letters[character];
-                        if (img != null){
-                            this.layer.screen.context.drawImage(img, imgx, imgy);
-                            col = col + 1;
-                        } else {
-                            _log('Trided to write character '+character+' which is not supported.');
-                        }
-                        break;
+                        // Move Down One Row on Carriage Return
+                        case "\n":
+                            row = row + 1;
+                            col = 0;
+                            break;
+                        default:
+                            character = character.toUpperCase();
+                            imgx = x + this.padding + (col * _letter_width);
+                            imgy = y + this.padding + (row * _letter_height);
+                            img = letters[character];
+                            if (img != null){
+                                this.layer.screen.context.drawImage(img, imgx, imgy);
+                                col = col + 1;
+                            } else {
+                                _log('Trided to write character '+character+' which is not supported.');
+                            }
+                            break;
                     }
                 }
                 col = col + 1;
@@ -694,7 +719,7 @@ function _tilemap_class( attributes ){
     for (row = 0; row < this.rows; row++) {
         this.tiles[row] = new Array(this.cols);
     }
-    
+
     this.backgrounds = new Array(this.rows);
     for (row = 0; row < this.rows; row++) {
         this.backgrounds[row] = new Array(this.cols);
@@ -714,6 +739,16 @@ function _tilemap_class( attributes ){
                 this.backgrounds[row][col][attribute] = value;
             }
         }
+    }
+    
+    this.clear_tiles = function(){
+        var row, col;
+        for (row = 0; row < this.rows; row++) {
+            for (col = 0; col < this.cols; col++) {
+                this.remove(row,col);
+            }
+        }
+
     }
 
     this.all_onclick = function(func){
@@ -799,18 +834,20 @@ function _tilemap_class( attributes ){
     }
 
     this.remove = function(row, col){
-       var tile, click_obj
-       tile = this.tiles[row][col]
-       // Removing Tile From Clickable Objects
-       for( var i=0; i<tile.layer.screen.clickable_objects.length; i++){
-            if ( tile.layer.screen.clickable_objects[i].id == tile.id ){
-                tile.layer.screen.clickable_objects.splice(i, 1)
+        var tile
+        tile = this.tiles[row][col]
+        if (tile != null){
+            // Removing Tile From Clickable Objects
+            for( var i=0; i<tile.layer.screen.clickable_objects.length; i++){
+                if ( tile.layer.screen.clickable_objects[i].id == tile.id ){
+                    tile.layer.screen.clickable_objects.splice(i, 1)
+                }
             }
-       }
 
-       this.tiles[row][col] = null;
-       tile = null;
-       return null;
+            this.tiles[row][col] = null;
+            tile = null;
+        }
+        return null;
     }
 
     this.draw = function(){
@@ -849,6 +886,9 @@ function _tilemap_class( attributes ){
     this.get_tile = function(i, j){
         return this.tiles[i][j];
     }
+    
+    
+    //this.clear_tiles();
 }
 
 // Builders

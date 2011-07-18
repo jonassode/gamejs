@@ -1,5 +1,4 @@
-
-
+// Create The Director Object
 var Director = new _director_class();
 
 // Namespace
@@ -20,7 +19,7 @@ window.onload = function () {
     // Create Layer
     var lb = Index.screen.layer("background");
     lb.node({
-        img:'images/map2.png'
+        image:'images/map2.png'
     });
 
     var ltm = Index.screen.layer("tilemap");
@@ -236,7 +235,7 @@ function place_tile(tile){
             Index.board.tiles[Index.tileplace.row][Index.tileplace.col] = null;
         }
         Index.board.tile(tile.row, tile.col, {
-            img:'images/'+Index.selected_tile.image
+            image:'images/'+Index.selected_tile.image
         }).interfaces=Index.selected_tile.interfaces;
         Index.tileplace = tile
         Index.bg.draw();
@@ -282,18 +281,12 @@ function calculate_places(){
                     }
 
                     if ( canPlaceTileHere == true ){
-
-                        Index.board.background(i,j).image = null
+                        Index.board.background(i,j).set_image(null)
                         Index.board.background(i,j).status = "legal"
                     } else {
-                        var img = new Image();
-                        img.src = 'images/cannotplacehere.png'
-                        
-                        Index.board.background(i,j).image = img
+                        Index.board.background(i,j).set_image('images/cannotplacehere.png')
                         Index.board.background(i,j).status = "illegal"
-
                     }
-
                 }
             }
         }
