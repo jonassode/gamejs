@@ -144,6 +144,7 @@ window.onload = function () {
 
     _load(Index.screen);
     Director.start_game();
+
 };
 
 

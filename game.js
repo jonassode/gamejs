@@ -2,29 +2,53 @@
 if (typeof jQuery == 'undefined') { 
     alert('Warning!\njQuery is not loaded.\nAs of version 0.010 game.js requires jQuery\nPlease add a call to jQuery in your website and reload page.');
 }
-
-var scripts = document.getElementsByTagName("script");
-var gamejs_folder = (scripts[scripts.length-1].src).replace("game.js","");
+/**
+ * GAMEJS - A set of objects used for creating board games in the html5 canvas object
+ * 
+ * @public
+ * @name GAMEJS
+ * @namespace GAMEJS
+ */
+var GAMEJS = {}
 
 // Globals
+GAMEJS.scripts = document.getElementsByTagName("script");
+GAMEJS.gamejs_folder = (GAMEJS.scripts[GAMEJS.scripts.length-1].src).replace("game.js","");
 var _visible_screen = null;
 var _id_list = new Array();
 var _id_hash = {};
 var _images = new Array();
 var _preloading_screen = null;
 var _first_screen = null;
-var _letter_padding = 2;
-var _letter_width = 5 + _letter_padding; // Including Padding
-var _letter_height = 8 + _letter_padding; // Including Padding
 
-// Load Alphabet
-var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890";
-var letters = {};
+/**
+ * GAMEJS.Alpha - A set of methods for holding the letters of the printable alphabet,
+ * Used by textboxes when text is written
+ * 
+ * @public
+ * @name GAMEJS.Alpha
+ * @namespace GAMEJS.Alpha
+ */
+GAMEJS.Alpha = {}
+GAMEJS.Alpha.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890";
+GAMEJS.Alpha.letters = {};
+GAMEJS.Alpha.letter_padding = 2;
+GAMEJS.Alpha.letter_width = 5 + GAMEJS.Alpha.letter_padding; // Including Padding
+GAMEJS.Alpha.letter_height = 8 + GAMEJS.Alpha.letter_padding; // Including Padding
 
-for (var counter = 0;counter < alphabet.length ;counter++ ) {
-    letters[alphabet[counter]] = new Image();
-    letters[alphabet[counter]].src = gamejs_folder + "Images/"+alphabet[counter]+".gif";
-    _images[_images.length] = letters[alphabet[counter]];
+/**
+ *  GAMEJS.Alpha.load() - Load the alphabet
+ *
+ * @public
+ * @static
+ * @function
+ */
+GAMEJS.Alpha.load = function(){
+    for (var counter = 0;counter < this.alphabet.length ;counter++ ) {
+        this.letters[this.alphabet[counter]] = new Image();
+        this.letters[this.alphabet[counter]].src = GAMEJS.gamejs_folder + "Images/"+this.alphabet[counter]+".gif";
+        _images[_images.length] = this.letters[this.alphabet[counter]];
+    }
 }
 
 // Movement
@@ -46,12 +70,27 @@ var _right = {
 };
 
 // Classes
-// Will be moved to game.js later
+
+/**
+ * Object for Doing Player Stuff.
+ *
+ * @public
+ * @name GAMEJS.Player
+ * @namespace GAMEJS.Player
+ */
 function _player_class( attributes ){
     this.name = (attributes.name || "guest");
     this.status = "ACTIVE"
     this.resources = new Array();
 
+    /**
+ *  bla bla
+ *
+ * @public
+ * @static
+ * @function
+ * @param resource            bla bla
+ */
     this.add_resource = function(resource){
         this.resources[this.resources.length] = jQuery.extend(true, {}, resource);
     }
@@ -564,9 +603,12 @@ function _screen_class( canvas_name, attributes ){
         return this;
     };
 
+    // Registers a key press event to the screen
+    // Returns self-reference
     this.keypress = function(character, func){
         var charUpperCase = character.toUpperCase()
         this.keypresses[charUpperCase] = func;
+        return this;
     };
 
 }
@@ -609,8 +651,8 @@ function _textbox_class( attributes ){
         var img = null;
         var word = null;
 
-        width = (this.width * _letter_width)+(this.padding * 2)- _letter_padding;
-        height = (this.height * _letter_height)+(this.padding * 2) -_letter_padding;
+        width = (this.width * GAMEJS.Alpha.letter_width)+(this.padding * 2)- GAMEJS.Alpha.letter_padding;
+        height = (this.height * GAMEJS.Alpha.letter_height)+(this.padding * 2) -GAMEJS.Alpha.letter_padding;
 
         this.layer.screen.context.fillStyle = this.color;
         this.layer.screen.context.fillRect(x, y, width, height);
@@ -649,9 +691,9 @@ function _textbox_class( attributes ){
                             break;
                         default:
                             character = character.toUpperCase();
-                            imgx = x + this.padding + (col * _letter_width);
-                            imgy = y + this.padding + (row * _letter_height);
-                            img = letters[character];
+                            imgx = x + this.padding + (col * GAMEJS.Alpha.letter_width);
+                            imgy = y + this.padding + (row * GAMEJS.Alpha.letter_height);
+                            img = GAMEJS.Alpha.letters[character];
                             if (img != null){
                                 this.layer.screen.context.drawImage(img, imgx, imgy);
                                 col = col + 1;
@@ -888,7 +930,7 @@ function _tilemap_class( attributes ){
     }
     
     
-    //this.clear_tiles();
+//this.clear_tiles();
 }
 
 // Builders
@@ -922,6 +964,9 @@ function _generate_id(type){
 }
 
 function _load(screen){
+    
+    // Load Alphabet
+    GAMEJS.Alpha.load()
 
     // Register Keypress Function
     var canvas_name = screen.canvas.id
