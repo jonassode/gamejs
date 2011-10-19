@@ -12,8 +12,6 @@ window.onload = function() {
 	// Create screen
 	Index.screen = _screen("game", {});
 
-	// Register Events
-
 	// Create Layers and Objects
 	var lb = Index.screen.layer("background");
 	lb.node({
@@ -33,10 +31,17 @@ window.onload = function() {
 		row : 0
 	});
 
+	// Creating the player
 	var player = tm._tile({
 		image : 'man.gif'
 	});
 	player.tilemap = tm;
+	player.hp = 20;
+	player.food = 40;
+	player.water = 40;
+	player.level = 1;
+	player.xp = 0;
+	player.nextlevel = 100;
 
 	make_map(tm, player);
 
@@ -49,6 +54,17 @@ window.onload = function() {
 		padding : 8,
 		text : "Instructions:\nWalk with W,A,S,D. Use space to investigate."
 	});
+
+	// Create Statbox
+	var sb = lb.textbox({
+		x : 498,
+		y : 10,
+		width : 17,
+		height : 44,
+		padding : 8,
+		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\n\nEquiptment:\nNone!"
+	});
+	Index.stats = sb;
 
 	// Register movements
 	Index.screen.keypress('w', function() {
@@ -68,7 +84,7 @@ window.onload = function() {
 		Director.end_turn();
 	});
 	Index.screen.keypress(' ', function() {
-		tb.text = tm.backgrounds[player.row][player.col].text;
+		tb.text = tm.background(player.row,player.col).space();
 		tb.draw();
 	});
 
@@ -78,6 +94,7 @@ window.onload = function() {
 	_load(Index.screen);
 
 };
+
 function make_map(tm, player) {
 
 	tm.clear_tiles();
@@ -86,15 +103,17 @@ function make_map(tm, player) {
 	// build tiles
 	var wall = tm._tile({
 		image : 'cave_wall.gif',
-		walkable : false
+		walkable : false,
 	});
 	var tree = tm._tile({
 		image : 'tree.gif',
-		text : "this is a tree"
+		text : "this is a tree",
+		space : function(){Index.player.food = 40;}
 	})
 	var water = tm._tile({
 		image : 'water.gif',
-		text : "this is a pond"
+		text : "this is a pond",
+		space : function(){Index.player.water = 40;}
 	})
 	var stairs = tm._tile({
 		image : 'cave_stairs.gif',
@@ -117,7 +136,7 @@ function make_map(tm, player) {
 		tm.place(j, tm.cols - 1, wall);
 	}
 
-	// Place 20 random tiles
+	// Place 40 random tiles
 	for(var i = 0; i < 40; i++) {
 
 		var random_row = function() {
@@ -135,7 +154,7 @@ function make_map(tm, player) {
 
 	// Place player on start position,
 	tm.background(3, 3).set_image('cave_floor.gif').text = "";
-	tm.place_tile(3, 3, player).onclick(function() {alert('test')
+	tm.place_tile(3, 3, player).onclick(function() {alert('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name.')
 	});
 	// Place stairs on ending position,
 	Index.end = tm.place(tm.rows - 3, tm.cols - 3, stairs);
@@ -146,6 +165,15 @@ function make_map(tm, player) {
 }
 
 function _end_of_turn() {
+	// Decrease Food and Water
+	Index.player.food--;
+	Index.player.water--;
+	Index.stats.draw();
+
+	if(Index.player.food <= 0 || Index.player.water <= 0) {
+		alert('You died a glorious death of starvation and/or thirst. You will be remembered for that.\n\nPlease Refresh to play again.');
+	}
+
 	if((Index.player.row == Index.end.row) && ((Index.player.col == Index.end.col))) {
 		make_map(Index.tilemap, Index.player);
 	}
