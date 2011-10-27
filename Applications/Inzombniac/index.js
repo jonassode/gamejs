@@ -37,11 +37,14 @@ window.onload = function() {
 	});
 	player.tilemap = tm;
 	player.hp = 20;
-	player.food = 40;
-	player.water = 40;
+	player.food = 70;
+	player.water = 70;
 	player.level = 1;
 	player.xp = 0;
 	player.nextlevel = 100;
+	player.moved = false;
+	player.attack = 5;
+	player.defense = 5;
 
 	make_map(tm, player);
 
@@ -62,38 +65,62 @@ window.onload = function() {
 		width : 17,
 		height : 44,
 		padding : 8,
-		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\n\nEquiptment:\nNone!"
+		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\n\nEquiptment:\nNone!"
 	});
 	Index.stats = sb;
 
 	// Register movements
 	Index.screen.keypress('w', function() {
 		player.move(_up);
+		player.moved = true;
 		Director.end_turn();
 	});
 	Index.screen.keypress('s', function() {
 		player.move(_down);
+		player.moved = true;
 		Director.end_turn();
 	});
 	Index.screen.keypress('a', function() {
 		player.move(_left);
+		player.moved = true;
 		Director.end_turn();
 	});
 	Index.screen.keypress('d', function() {
 		player.move(_right);
+		player.moved = true;
 		Director.end_turn();
 	});
 	Index.screen.keypress(' ', function() {
-		tb.text = tm.background(player.row,player.col).space();
-		tb.draw();
+		tm.background(player.row,player.col).space();
+		Director.end_turn();
 	});
 
 	Index.tilemap = tm;
 	Index.player = player;
+	Index.textbox = tb;
+
+	Preload('cave_floor.gif');
+	Preload('cave_stairs.gif');
+	Preload('cave_wall.gif');
+	Preload('ground.gif');
+	Preload('man.gif');
+	Preload('town.gif');
+	Preload('tree.gif');
+	Preload('tree_chopped.gif');
+	Preload('tree_empty.gif');
+	Preload('water.gif');
+	Preload('zombie.gif');
+	Preload('bg.png');
 
 	_load(Index.screen);
+	Director.start_game();
 
 };
+
+function say(text) {
+	Index.textbox.text = text;
+	Index.textbox.draw();
+}
 
 function make_map(tm, player) {
 
@@ -107,18 +134,38 @@ function make_map(tm, player) {
 	});
 	var tree = tm._tile({
 		image : 'tree.gif',
-		text : "this is a tree",
-		space : function(){Index.player.food = 40;}
-	})
+	});
+	tree.text = "this is a tree";
+	tree.state = "NEW";
+	tree.space = function(){
+		switch(this.state)
+		{
+		case "NEW":
+			Index.player.food = Index.player.food + 20;
+			say("You ate the forbidden fruit. You are slightly less hungry.");
+			this.set_image('tree_empty.gif');
+			this.state = "EATEN";
+			break;
+		default:
+			say("There is nothing for you here.");
+			break;
+		}
+	}
+
 	var water = tm._tile({
 		image : 'water.gif',
-		text : "this is a pond",
-		space : function(){Index.player.water = 40;}
-	})
+	});
+	water.text = "this is a pond",
+	water.space = function(){
+		Index.player.water = 70;
+		say("You drank the Kool Aid. You are thirsty no more.");
+	}
+
 	var stairs = tm._tile({
 		image : 'cave_stairs.gif',
-		text : "down we go"
-	})
+	});
+	stairs.text = "down we go";
+
 
 	for(var i = 0; i < tm.cols; i++) {
 		for(var j = 1; j < tm.rows; j++) {
@@ -166,8 +213,13 @@ function make_map(tm, player) {
 
 function _end_of_turn() {
 	// Decrease Food and Water
-	Index.player.food--;
-	Index.player.water--;
+	if ( Index.player.moved == true ) {
+		Index.player.food--;
+		Index.player.water--;
+	}
+	// Reset moved state
+	Index.player.moved = false;
+
 	Index.stats.draw();
 
 	if(Index.player.food <= 0 || Index.player.water <= 0) {
