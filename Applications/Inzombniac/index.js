@@ -45,6 +45,7 @@ window.onload = function() {
 	player.moved = false;
 	player.attack = 5;
 	player.defense = 5;
+	player.wood = 0;
 
 	make_map(tm, player);
 
@@ -65,7 +66,7 @@ window.onload = function() {
 		width : 17,
 		height : 44,
 		padding : 8,
-		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\n\nEquiptment:\nNone!"
+		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!"
 	});
 	Index.stats = sb;
 
@@ -122,6 +123,14 @@ function say(text) {
 	Index.textbox.draw();
 }
 
+function random_row(tm) {
+	return (Math.floor(Math.random() * (tm.rows - 6))) + 3;
+}
+
+function random_col(tm) {
+	return (Math.floor(Math.random() * (tm.cols - 6))) + 3;
+}
+
 function make_map(tm, player) {
 
 	tm.clear_tiles();
@@ -135,6 +144,7 @@ function make_map(tm, player) {
 	var tree = tm._tile({
 		image : 'tree.gif',
 	});
+
 	tree.text = "this is a tree";
 	tree.state = "NEW";
 	tree.space = function(){
@@ -144,10 +154,17 @@ function make_map(tm, player) {
 			Index.player.food = Index.player.food + 20;
 			say("You ate the forbidden fruit. You are slightly less hungry.");
 			this.set_image('tree_empty.gif');
-			this.state = "EATEN";
+			this.state = "EMPTY";
+			break;
+		case "EMPTY":
+			Index.player.wood++;
+			say("You chopped down the tree with your mighty sword, which is slight less sharp now.");
+			this.set_image('tree_chopped.gif');
+			this.state = "CHOPPED";
+			Index.player.moved = true;
 			break;
 		default:
-			say("There is nothing for you here.");
+			say("What once was a mighty beautiful tree is now just a stubb. A sad old stubb. There is nothign for you here.");
 			break;
 		}
 	}
@@ -158,18 +175,22 @@ function make_map(tm, player) {
 	water.text = "this is a pond",
 	water.space = function(){
 		Index.player.water = 70;
-		say("You drank the Kool Aid. You are thirsty no more.");
+		say("You water from the pond. You are thirsty no more.");
 	}
 
 	var stairs = tm._tile({
 		image : 'cave_stairs.gif',
 	});
 	stairs.text = "down we go";
-
+	var zombie = tm._tile({
+		image:'zombie.gif',
+		walkable:false,
+	});
 
 	for(var i = 0; i < tm.cols; i++) {
 		for(var j = 1; j < tm.rows; j++) {
-			tm.background(j, i).set_image('cave_floor.gif');
+			tm.background(j, i).set_image('ground.gif');
+			tm.background(j, i).space = function() { say('Nothing of interest here'); }
 		}
 	}
 
@@ -186,21 +207,23 @@ function make_map(tm, player) {
 	// Place 40 random tiles
 	for(var i = 0; i < 40; i++) {
 
-		var random_row = function() {
-			return (Math.floor(Math.random() * (tm.rows - 6))) + 3;
-		}
-		var random_col = function() {
-			return (Math.floor(Math.random() * (tm.cols - 6))) + 3;
-		}
-		_log(random_row(), random_col());
-		tm.place(random_row(), random_col(), tree);
-		tm.place(random_row(), random_col(), water);
-		tm.place(random_row(), random_col(), wall);
+		tm.place(random_row(tm), random_col(tm), tree);
+		tm.place(random_row(tm), random_col(tm), water);
+		tm.place(random_row(tm), random_col(tm), wall);
 
 	}
 
+	// Place Zombies On Empty Squares
+	for(var i = 0; i < 20; i++) {
+		var r = random_row(tm);
+		var c = random_col(tm);
+		if ( tm.background(r,c).walkable != false ) {
+			tm.place_tile(r, c, zombie);
+		}
+	} 
+
 	// Place player on start position,
-	tm.background(3, 3).set_image('cave_floor.gif').text = "";
+	tm.background(3, 3).set_image('ground.gif').text = "";
 	tm.place_tile(3, 3, player).onclick(function() {alert('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name.')
 	});
 	// Place stairs on ending position,
