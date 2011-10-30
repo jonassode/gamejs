@@ -33,7 +33,7 @@ task :create_folder do
 	puts dir_root
 end
 
-desc "Creates all common tasks"
+desc "Runs all common tasks"
 task :default => [:test,:create_folder] do
     
 end
