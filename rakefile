@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+# Imports 
+require 'fileutils'
+
+desc "Runs Tests"
+task :test do
+    puts "Running Tests for " + ENV['game']
+end
+
+desc "Creates folder"
+task :create_folder do
+
+	puts "Checking if 'Deploys' Directory exists"
+
+	if ! File.directory? 'Deploys'
+	    Dir.mkdir("Deploys")
+	    puts "Created 'Deploys' Directory"
+	end
+
+	puts 'Deploying application ' + ENV['game']
+
+	t = Time.now().strftime("%Y%m%d_%H%M");
+
+	dir_root = "Deploys/" +ENV['game'] + t
+	dir_ex = dir_root + "/Applications"
+	Dir.mkdir(dir_root)
+	Dir.mkdir(dir_ex)
+	FileUtils.cp("game.js", dir_root)
+	FileUtils.cp_r("Images", dir_root)
+	FileUtils.cp_r('Applications/' + ENV['game'], dir_ex)
+
+	puts dir_root
+end
+
+desc "Creates all common tasks"
+task :default => [:test,:create_folder] do
+    
+end
