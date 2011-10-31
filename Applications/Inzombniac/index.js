@@ -189,7 +189,7 @@ function make_map(tm, player) {
 
 	for(var i = 0; i < tm.cols; i++) {
 		for(var j = 1; j < tm.rows; j++) {
-			tm.background(j, i).set_image('ground.gif');
+			tm.background(j, i).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif');
 			tm.background(j, i).space = function() { say('Nothing of interest here'); }
 		}
 	}
@@ -223,7 +223,9 @@ function make_map(tm, player) {
 	} 
 
 	// Place player on start position,
-	tm.background(3, 3).set_image('ground.gif').text = "";
+	tm.background(3, 3).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif' ).text = "";
+	tm.background(3, 3).walkable = true;
+	tm.background(3, 3).space = function() { say('Nothing of interest here'); }
 	tm.place_tile(3, 3, player).onclick(function() {alert('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name.')
 	});
 	// Place stairs on ending position,
@@ -244,6 +246,15 @@ function _end_of_turn() {
 	Index.player.moved = false;
 
 	Index.stats.draw();
+
+	// Warning if low on food
+	if(Index.player.food <= 10){
+		say('You are running low on food. You need to eat very soon.');
+	}
+	// Water Warning
+	if( Index.player.water <= 10) {
+		say('You are running low on water. You need to drink very soon.');
+	}
 
 	if(Index.player.food <= 0 || Index.player.water <= 0) {
 		alert('You died a glorious death of starvation and/or thirst. You will be remembered for that.\n\nPlease Refresh to play again.');
