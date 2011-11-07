@@ -46,6 +46,8 @@ window.onload = function() {
 	player.attack = 5;
 	player.defense = 5;
 	player.wood = 0;
+	player.name = "You, the Noble Lord Zedrik";
+	player.object = "hero";
 
 	make_map(tm, player);
 
@@ -72,24 +74,16 @@ window.onload = function() {
 
 	// Register movements
 	Index.screen.keypress('w', function() {
-		player.move(_up);
-		player.moved = true;
-		Director.end_turn();
+		move(_up);
 	});
 	Index.screen.keypress('s', function() {
-		player.move(_down);
-		player.moved = true;
-		Director.end_turn();
+		move(_down);
 	});
 	Index.screen.keypress('a', function() {
-		player.move(_left);
-		player.moved = true;
-		Director.end_turn();
+		move(_left);
 	});
 	Index.screen.keypress('d', function() {
-		player.move(_right);
-		player.moved = true;
-		Director.end_turn();
+		move(_right);
 	});
 	Index.screen.keypress(' ', function() {
 		tm.background(player.row,player.col).space();
@@ -103,7 +97,7 @@ window.onload = function() {
 	Preload('cave_floor.gif');
 	Preload('cave_stairs.gif');
 	Preload('cave_wall.gif');
-	Preload('ground.gif');
+	Preload('ground_0.gif');
 	Preload('man.gif');
 	Preload('town.gif');
 	Preload('tree.gif');
@@ -118,10 +112,59 @@ window.onload = function() {
 
 };
 
+function fight(actor, monster){
+	var attack = Math.floor(Math.random() * actor.attack + 3);
+	monster.hp = monster.hp - attack;
+
+	say_again(actor.name + " attack " + monster.name + " and do " + attack + " damage.");
+	if ( monster.hp > 0 ) {			
+		say_again("Hp left " + monster.hp);
+	} else {
+		say_again(monster.name + " died");
+		if ( monster.list != null){
+			monster.list[monster.index] = null;
+		}
+		Index.tilemap.remove(monster.row, monster.col);
+		
+	}
+
+}
+
+function move(direction){
+	Index.textbox.text = "";
+	var pos = Index.player.get_position_from_direction(direction);
+	var dest_bg = Index.tilemap.background(pos.row, pos.col);
+	var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
+
+
+	if ( dest_tile != null ) {
+		if ( dest_tile.object == "monster" ) {
+			fight(Index.player, dest_tile);
+			Index.player.moved = true;
+			Director.end_turn();
+		}
+
+	} else if ( dest_bg.walkable != false ) {
+		Index.player.move(direction);
+		Index.player.moved = true;
+		Director.end_turn();
+	}
+}
+
 function say(text) {
 	Index.textbox.text = text;
 	Index.textbox.draw();
 }
+
+function say_again(text) {
+	if ( Index.textbox.text != ""){
+		Index.textbox.text = Index.textbox.text + "\n" + text;
+	} else {
+		Index.textbox.text = text;
+	}
+	Index.textbox.draw();
+}
+
 
 function random_row(tm) {
 	return (Math.floor(Math.random() * (tm.rows - 6))) + 3;
@@ -186,6 +229,11 @@ function make_map(tm, player) {
 		image:'zombie.gif',
 		walkable:false,
 	});
+	zombie.defense = 5;
+	zombie.attack = 5;
+	zombie.hp = 10;
+	zombie.object = "monster";
+	zombie.name = "Zombie";
 
 	for(var i = 0; i < tm.cols; i++) {
 		for(var j = 1; j < tm.rows; j++) {
@@ -213,12 +261,19 @@ function make_map(tm, player) {
 
 	}
 
+	// Clear list of enemies
+	Index.enemies = new Array();
+
 	// Place Zombies On Empty Squares
 	for(var i = 0; i < 20; i++) {
 		var r = random_row(tm);
 		var c = random_col(tm);
 		if ( tm.background(r,c).walkable != false ) {
 			tm.place_tile(r, c, zombie);
+			var index = Index.enemies.length;
+			Index.enemies[index] = tm.get_tile(r, c);
+			tm.get_tile(r,c).index = index;
+			tm.get_tile(r,c).list = Index.enemies;
 		}
 	} 
 
@@ -236,6 +291,40 @@ function make_map(tm, player) {
 	tm.draw();
 }
 
+function move_enemy(actor){
+	var direction = null;
+
+	switch(Math.floor(Math.random() * 4))
+	{
+	case 0:
+	  direction = _up;
+	  break;
+	case 1:
+	  direction = _down;
+	  break;
+	case 2:
+	  direction = _left;
+	  break;
+	case 3:
+	  direction = _right;
+	  break;
+	default:
+		_log('bajs');
+	}
+
+	var pos = actor.get_position_from_direction(direction);
+	var dest_bg = Index.tilemap.background(pos.row, pos.col);
+	var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
+
+	if ( dest_tile != null ) {
+		if ( dest_tile.object == "hero" ) {
+			fight(actor, dest_tile);
+		}
+	} else if ( dest_bg.walkable != false ) {
+		Index.tilemap.move_tile(pos.row, pos.col, actor);
+	}
+}
+
 function _end_of_turn() {
 	// Decrease Food and Water
 	if ( Index.player.moved == true ) {
@@ -245,7 +334,6 @@ function _end_of_turn() {
 	// Reset moved state
 	Index.player.moved = false;
 
-	Index.stats.draw();
 
 	// Warning if low on food
 	if(Index.player.food <= 10){
@@ -256,13 +344,26 @@ function _end_of_turn() {
 		say('You are running low on water. You need to drink very soon.');
 	}
 
+	// Check if player died fo starvation
 	if(Index.player.food <= 0 || Index.player.water <= 0) {
 		alert('You died a glorious death of starvation and/or thirst. You will be remembered for that.\n\nPlease Refresh to play again.');
 	}
 
+	// Check if the player is on the stairs
 	if((Index.player.row == Index.end.row) && ((Index.player.col == Index.end.col))) {
 		make_map(Index.tilemap, Index.player);
 	}
+
+	//
+	for(var i=0; i < Index.enemies.length;i++){
+		if ( Index.enemies[i] != null){
+			move_enemy(Index.enemies[i]);	
+		}
+	}
+
+	// Redraw stuff 
+	Index.stats.draw();
+	Index.tilemap.draw();
 }
 
 // Override Methods

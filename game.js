@@ -405,6 +405,13 @@ function _layer_class(layer_name) {
 	};
 }
 
+// Position Class
+function _position(row, col){
+	this.row = row;
+	this.col = col;
+}
+
+// Node Class
 function _node_class(attributes) {
 	this.id = _generate_id("n");
 	_id_hash[this.id] = this
@@ -471,6 +478,17 @@ function _node_class(attributes) {
 	this.set = function(attribute, value) {
 		this[attribute] = value;
 	}
+
+	this.get_position_from_direction = function(direction){
+		var y = this.row;
+		var x = this.col;
+		// Calculate New Direction
+		var newrow = y + direction.row;
+		var newcol = x + direction.col;
+
+		return new _position(newrow, newcol); 
+	}
+
 	// Movement
 	this.move = function(direction) {
 		if(this.type == 'tile') {
@@ -479,13 +497,12 @@ function _node_class(attributes) {
 
 			var y = this.row;
 			var x = this.col;
-			// Calculate New Direction
-			var newrow = y + direction.row;
-			var newcol = x + direction.col;
 
-			if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols) ) {
+			var pos = this.get_position_from_direction(direction);
 
-				this.tilemap.move_tile(newrow, newcol, this);
+			if(!(pos.row < 0) && !(pos.col < 0) && !(pos.row >= this.tilemap.rows) && !(pos.col >= this.tilemap.cols) ) {
+
+				this.tilemap.move_tile(pos.row, pos.col, this);
 
 				//
 				var newtilemaprow = this.tilemap.row + direction.row;
