@@ -483,7 +483,7 @@ function _node_class(attributes) {
 			var newrow = y + direction.row;
 			var newcol = x + direction.col;
 
-			if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols) && !(this.tilemap.background(newrow, newcol).walkable == false)) {
+			if(!(newrow < 0) && !(newcol < 0) && !(newrow >= this.tilemap.rows) && !(newcol >= this.tilemap.cols) ) {
 
 				this.tilemap.move_tile(newrow, newcol, this);
 
