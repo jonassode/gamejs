@@ -68,7 +68,7 @@ window.onload = function() {
 		width : 17,
 		height : 44,
 		padding : 8,
-		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!"
+		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp} - {Index.player.nextlevel}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!"
 	});
 	Index.stats = sb;
 
@@ -125,7 +125,9 @@ function fight(actor, monster){
 			monster.list[monster.index] = null;
 		}
 		Index.tilemap.remove(monster.row, monster.col);
-		
+		var gained_xp = Math.floor(Math.random() * 15 + 10)
+		actor.xp = actor.xp + gained_xp;
+		say_again(actor.name + " gained " + gained_xp + " xp.");		
 	}
 
 }
@@ -184,6 +186,20 @@ function make_map(tm, player) {
 		image : 'cave_wall.gif',
 		walkable : false,
 	});
+	var heart = tm._tile({
+		image : 'heart.gif',
+	});
+	heart.state = "FULL";
+	heart.space = function(){
+		if ( this.state == "FULL" ) {
+			Index.player.hp = 20;
+			say("You ate the bellpepper. Your health is full.");
+			this.set_image('heart_empty.gif');
+			this.state = "EMPTY";
+		} else {
+			say("This is only the shell of a bellpepper.");
+		}
+	}
 	var tree = tm._tile({
 		image : 'tree.gif',
 	});
@@ -258,6 +274,13 @@ function make_map(tm, player) {
 		tm.place(random_row(tm), random_col(tm), tree);
 		tm.place(random_row(tm), random_col(tm), water);
 		tm.place(random_row(tm), random_col(tm), wall);
+
+	}
+
+	// 10 random hearts
+	for(var i = 0; i < 10; i++) {
+
+		tm.place(random_row(tm), random_col(tm), heart);
 
 	}
 
