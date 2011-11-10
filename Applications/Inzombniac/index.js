@@ -137,6 +137,7 @@ function fight(actor, monster){
 }
 
 function gain_level(actor) {
+	actor.level = actor.level + 1;
 	actor.xp = 0;
 	actor.nextlevel = actor.nextlevel + Math.floor(actor.nextlevel * 0.2);
 	actor.maxhp = actor.maxhp + Math.floor(actor.maxhp * 0.2);
