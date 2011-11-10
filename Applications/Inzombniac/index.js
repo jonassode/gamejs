@@ -36,7 +36,8 @@ window.onload = function() {
 		image : 'man.gif'
 	});
 	player.tilemap = tm;
-	player.hp = 20;
+	player.maxhp = 20;
+	player.hp = player.maxhp;
 	player.food = 70;
 	player.water = 70;
 	player.level = 1;
@@ -127,9 +128,23 @@ function fight(actor, monster){
 		Index.tilemap.remove(monster.row, monster.col);
 		var gained_xp = Math.floor(Math.random() * 15 + 10)
 		actor.xp = actor.xp + gained_xp;
-		say_again(actor.name + " gained " + gained_xp + " xp.");		
+		say_again(actor.name + " gained " + gained_xp + " xp.");
+		if ( actor.xp > actor.nextlevel ) {
+			gain_level(actor);	
+		}		
 	}
 
+}
+
+function gain_level(actor) {
+	actor.xp = 0;
+	actor.nextlevel = actor.nextlevel + Math.floor(actor.nextlevel * 0.2);
+	actor.maxhp = actor.maxhp + Math.floor(actor.maxhp * 0.2);
+	actor.attack = actor.attack + Math.floor( actor.attack * 0.2);
+	actor.defense = actor.defense + Math.floor( actor.defense * 0.2);
+	actor.hp = actor.maxhp;
+
+	say_again(actor.name + " gained a Level!");
 }
 
 function move(direction){
@@ -192,7 +207,7 @@ function make_map(tm, player) {
 	heart.state = "FULL";
 	heart.space = function(){
 		if ( this.state == "FULL" ) {
-			Index.player.hp = 20;
+			Index.player.hp = player.maxhp;
 			say("You ate the bellpepper. Your health is full.");
 			this.set_image('heart_empty.gif');
 			this.state = "EMPTY";
