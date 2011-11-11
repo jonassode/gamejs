@@ -810,9 +810,20 @@ function _tilemap_class(attributes) {
 		this.tiles[row][col] = tile;
 		return tile;
 	}
-	// Places a specified tile on the tilemap
+
+	// Places a specified tile ( NOT A COPY OF IT ) on the tilemap
+	this.put_tile = function(row, col, tile) {
+		tile.layer = this.layer;
+		tile.row = row;
+		tile.col = col;
+		this.tiles[row][col] = tile;
+		return tile;
+	}
+
+	// Places a copy of a specified tile on the tilemap
 	this.place_tile = function(row, col, original_tile) {
 		var tile = jQuery.extend(true, {}, original_tile);
+		tile.layer = this.layer;
 		tile.id = _generate_id("n");
 		original_tile.row = row;
 		original_tile.col = col;
@@ -821,6 +832,7 @@ function _tilemap_class(attributes) {
 		tile.tilemap = this;
 		this.tiles[row][col] = tile;
 		return tile;
+
 	}
 	// Create A tile object ( but does not place it on the map )
 	this._tile = function(attributes) {
@@ -931,6 +943,18 @@ function _screen(screen_name, attributes) {
 	var s = new _screen_class(screen_name, attributes)
 
 	return s;
+}
+
+function _tile(attributes){
+	var tile = new _node_class(attributes);
+	//tile.layer = this.layer;
+	tile.type = 'tile';
+	// Update Interfaces
+	for(var i = 0; i < tile.interfaces.length; i++) {
+		tile.interfaces[i] = jQuery.extend(true, {}, tile.interfaces[i]);
+		tile.interfaces[i].parent = tile;
+	}
+	return tile;
 }
 
 // Search Functions

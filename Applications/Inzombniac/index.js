@@ -32,23 +32,8 @@ window.onload = function() {
 	});
 
 	// Creating the player
-	var player = tm._tile({
-		image : 'man.gif'
-	});
+	var player = NODES.player;
 	player.tilemap = tm;
-	player.maxhp = 20;
-	player.hp = player.maxhp;
-	player.food = 70;
-	player.water = 70;
-	player.level = 1;
-	player.xp = 0;
-	player.nextlevel = 100;
-	player.moved = false;
-	player.attack = 5;
-	player.defense = 5;
-	player.wood = 0;
-	player.name = "You, the Noble Lord Zedrik";
-	player.object = "hero";
 
 	make_map(tm, player);
 
@@ -87,7 +72,7 @@ window.onload = function() {
 		move(_right);
 	});
 	Index.screen.keypress(' ', function() {
-		tm.background(player.row,player.col).space();
+		tm.background(player.row,player.col).space(Index.player);
 		Director.end_turn();
 	});
 
@@ -125,7 +110,7 @@ function fight(actor, monster){
 		if ( monster.list != null){
 			monster.list[monster.index] = null;
 		}
-		Index.tilemap.remove(monster.row, monster.col);
+		monster.death();
 		var gained_xp = Math.floor(Math.random() * 15 + 10)
 		actor.xp = actor.xp + gained_xp;
 		say_again(actor.name + " gained " + gained_xp + " xp.");
@@ -149,23 +134,25 @@ function gain_level(actor) {
 }
 
 function move(direction){
-	Index.textbox.text = "";
-	var pos = Index.player.get_position_from_direction(direction);
-	var dest_bg = Index.tilemap.background(pos.row, pos.col);
-	var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
+	if ( player.status == "ALIVE" ) {
+		Index.textbox.text = "";
+		var pos = Index.player.get_position_from_direction(direction);
+		var dest_bg = Index.tilemap.background(pos.row, pos.col);
+		var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
 
 
-	if ( dest_tile != null ) {
-		if ( dest_tile.object == "monster" ) {
-			fight(Index.player, dest_tile);
+		if ( dest_tile != null ) {
+			if ( dest_tile.object == "monster" ) {
+				fight(Index.player, dest_tile);
+				Index.player.moved = true;
+				Director.end_turn();
+			}
+
+		} else if ( dest_bg.walkable != false ) {
+			Index.player.move(direction);
 			Index.player.moved = true;
 			Director.end_turn();
 		}
-
-	} else if ( dest_bg.walkable != false ) {
-		Index.player.move(direction);
-		Index.player.moved = true;
-		Director.end_turn();
 	}
 }
 
@@ -198,75 +185,14 @@ function make_map(tm, player) {
 	tm.all("walkable", null);
 
 	// build tiles
-	var wall = tm._tile({
-		image : 'cave_wall.gif',
-		walkable : false,
-	});
-	var heart = tm._tile({
-		image : 'heart.gif',
-	});
-	heart.state = "FULL";
-	heart.space = function(){
-		if ( this.state == "FULL" ) {
-			Index.player.hp = player.maxhp;
-			say("You ate the bellpepper. Your health is full.");
-			this.set_image('heart_empty.gif');
-			this.state = "EMPTY";
-		} else {
-			say("This is only the shell of a bellpepper.");
-		}
-	}
-	var tree = tm._tile({
-		image : 'tree.gif',
-	});
+	var wall = NODES.wall;
+	var heart = NODES.heart;
+	var tree = NODES.tree;
+	var water = NODES.water;
+	var stairs = NODES.stairs;
+	var zombie = NODES.zombie;
 
-	tree.text = "this is a tree";
-	tree.state = "NEW";
-	tree.space = function(){
-		switch(this.state)
-		{
-		case "NEW":
-			Index.player.food = Index.player.food + 20;
-			say("You ate the forbidden fruit. You are slightly less hungry.");
-			this.set_image('tree_empty.gif');
-			this.state = "EMPTY";
-			break;
-		case "EMPTY":
-			Index.player.wood++;
-			say("You chopped down the tree with your mighty sword, which is slight less sharp now.");
-			this.set_image('tree_chopped.gif');
-			this.state = "CHOPPED";
-			Index.player.moved = true;
-			break;
-		default:
-			say("What once was a mighty beautiful tree is now just a stubb. A sad old stubb. There is nothign for you here.");
-			break;
-		}
-	}
-
-	var water = tm._tile({
-		image : 'water.gif',
-	});
-	water.text = "this is a pond",
-	water.space = function(){
-		Index.player.water = 70;
-		say("You water from the pond. You are thirsty no more.");
-	}
-
-	var stairs = tm._tile({
-		image : 'cave_stairs.gif',
-	});
-	stairs.text = "down we go";
-	var zombie = tm._tile({
-		image:'zombie.gif',
-		walkable:false,
-	});
-	zombie.defense = 5;
-	zombie.attack = 5;
-	zombie.hp = 10;
-	zombie.object = "monster";
-	zombie.name = "Zombie";
-
+	// Draw Ground
 	for(var i = 0; i < tm.cols; i++) {
 		for(var j = 1; j < tm.rows; j++) {
 			tm.background(j, i).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif');
@@ -320,48 +246,15 @@ function make_map(tm, player) {
 	tm.background(3, 3).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif' ).text = "";
 	tm.background(3, 3).walkable = true;
 	tm.background(3, 3).space = function() { say('Nothing of interest here'); }
-	tm.place_tile(3, 3, player).onclick(function() {alert('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name.')
+	tm.put_tile(3, 3, player).onclick(function() {say('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name for such a wonderful man.')	
 	});
+
 	// Place stairs on ending position,
 	Index.end = tm.place(tm.rows - 3, tm.cols - 3, stairs);
 
 	tm.col = 0;
 	tm.row = 0;
 	tm.draw();
-}
-
-function move_enemy(actor){
-	var direction = null;
-
-	switch(Math.floor(Math.random() * 4))
-	{
-	case 0:
-	  direction = _up;
-	  break;
-	case 1:
-	  direction = _down;
-	  break;
-	case 2:
-	  direction = _left;
-	  break;
-	case 3:
-	  direction = _right;
-	  break;
-	default:
-		_log('bajs');
-	}
-
-	var pos = actor.get_position_from_direction(direction);
-	var dest_bg = Index.tilemap.background(pos.row, pos.col);
-	var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
-
-	if ( dest_tile != null ) {
-		if ( dest_tile.object == "hero" ) {
-			fight(actor, dest_tile);
-		}
-	} else if ( dest_bg.walkable != false ) {
-		Index.tilemap.move_tile(pos.row, pos.col, actor);
-	}
 }
 
 function _end_of_turn() {
@@ -383,9 +276,10 @@ function _end_of_turn() {
 		say('You are running low on water. You need to drink very soon.');
 	}
 
-	// Check if player died fo starvation
+	// Check if player died of starvation
 	if(Index.player.food <= 0 || Index.player.water <= 0) {
-		alert('You died a glorious death of starvation and/or thirst. You will be remembered for that.\n\nPlease Refresh to play again.');
+		say('You died a glorious death of starvation and/or thirst. You will be remembered for that.\n\nPlease Refresh to play again.');
+		Index.player.death();
 	}
 
 	// Check if the player is on the stairs
@@ -396,7 +290,7 @@ function _end_of_turn() {
 	//
 	for(var i=0; i < Index.enemies.length;i++){
 		if ( Index.enemies[i] != null){
-			move_enemy(Index.enemies[i]);	
+			Index.enemies[i].move();	
 		}
 	}
 
