@@ -41,8 +41,8 @@ window.onload = function() {
 	var tb = lb.textbox({
 		x : 10,
 		y : 400,
-		width : 67,
-		height : 5,
+		cols : 67,
+		rows : 5,
 		padding : 8,
 		text : "Instructions:\nWalk with W,A,S,D. Use space to investigate."
 	});
@@ -51,12 +51,14 @@ window.onload = function() {
 	var sb = lb.textbox({
 		x : 498,
 		y : 10,
-		width : 17,
-		height : 44,
+		cols : 17,
+		rows : 40,
 		padding : 8,
 		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp} - {Index.player.nextlevel}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!"
 	});
 	Index.stats = sb;
+
+	lb.button({x: 498, y: 440, text: "Inventory" }).onclick(function() { say('a');});
 
 	// Register movements
 	Index.screen.keypress('w', function() {
