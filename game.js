@@ -696,7 +696,7 @@ function _textbox_class(attributes) {
 				}
 
 				// Check if we want to move to next row
-				if(word.length + col > this.width) {
+				if(word.length + col > this.cols) {
 					row = row + 1;
 					col = 0;
 				}
