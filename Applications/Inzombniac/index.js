@@ -15,7 +15,7 @@ window.onload = function() {
 	// Create Layers and Objects
 	var lb = Index.screen.layer("background");
 	lb.node({
-		img : 'bg.png'
+		image : 'bg.png'
 	});
 	// Tile Map
 
