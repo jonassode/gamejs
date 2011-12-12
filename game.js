@@ -680,7 +680,8 @@ function _textbox_class(attributes) {
 
 		if(this.text != null && this.text != undefined) {
 
-			var words = this.text.toString().split(" ");
+			var temp_text = this.text.replace(/\n/g," \n");
+			var words = temp_text.toString().split(/[ ]/);
 			for(var wi = 0; wi < words.length; wi++) {
 				word = words[wi];
 
