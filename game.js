@@ -340,6 +340,7 @@ function _layer_class(layer_name) {
 	this.tilemaps = new Array();
 	this.lables = new Array();
 	this.textboxes = new Array();
+	this.buttons = new Array();
 
 	// Add Layer to Id Hahs
 	_id_hash[this.id] = this
@@ -359,6 +360,9 @@ function _layer_class(layer_name) {
 		}
 		for(var tbi = 0; tbi < this.textboxes.length; tbi++) {
 			this.textboxes[tbi].draw();
+		}
+		for(var bbi = 0; bbi < this.buttons.length; bbi++) {
+			this.buttons[bbi].draw();
 		}
 
 		return this;
@@ -387,13 +391,23 @@ function _layer_class(layer_name) {
 		this.lables[this.lables.length] = l;
 		return l;
 	};
-	// Create a lable
+
+	// Create a textbox
 	this.textbox = function(attributes) {
 		var tb = new _textbox_class(attributes);
 		tb.layer = this;
 		this.textboxes[this.textboxes.length] = tb;
 		return tb;
 	};
+
+	// Create a button
+	this.button = function(attributes) {
+		var button = new _button_class(attributes);
+		button.layer = this;
+		this.buttons[this.buttons.length] = button;
+		return button;
+	};
+
 	// Create a tilemap
 	this.tilemap = function(attributes) {
 		var tm = new _tilemap_class(attributes);
@@ -626,14 +640,27 @@ function _lable_class(attributes) {
 	}
 }
 
+function _button_class(attributes) {
+	var button = new _textbox_class(attributes);
+	
+	button.onclick = function(onclick_function) {
+		this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
+		// Register function for this tiles onlick event
+		this.onclick_event = onclick_function;
+	}
+	return button;
+}
+
 function _textbox_class(attributes) {
 	this.padding = (attributes.padding || 3);
 	this.x = (attributes.x || 0);
 	this.y = (attributes.y || 0);
 	this.text = (attributes.text || "");
-	this.width = (attributes.width || this.text.length || 1);
+	this.cols = (attributes.cols || this.text.length || 1);
 	this.color = (attributes.color || '#000');
-	this.height = (attributes.height || 1);
+	this.rows = (attributes.rows || 1);
+	this.width = null;
+	this.height = null;
 
 	this.draw = function() {
 		var x = this.x + this.layer.screen.offsetx;
@@ -645,11 +672,11 @@ function _textbox_class(attributes) {
 		var character = null;
 		var img = null;
 		var word = null;
-		width = (this.width * GAMEJS.Alpha.letter_width) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
-		height = (this.height * GAMEJS.Alpha.letter_height) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
+		this.width = (this.cols * GAMEJS.Alpha.letter_width) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
+		this.height = (this.rows * GAMEJS.Alpha.letter_height) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
 
 		this.layer.screen.context.fillStyle = this.color;
-		this.layer.screen.context.fillRect(x, y, width, height);
+		this.layer.screen.context.fillRect(x, y, this.width, this.height);
 
 		if(this.text != null && this.text != undefined) {
 
