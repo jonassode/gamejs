@@ -52,7 +52,7 @@ GAMEJS.Alpha.load = function() {
 		_images[_images.length] = this.letters[this.alphabet[counter]];
 	}
 }
-// Movement
+// Directions
 var _up = {
 	row : -1,
 	col : 0
@@ -692,7 +692,7 @@ function _textbox_class(attributes) {
 								this.layer.screen.context.drawImage(img, imgx, imgy);
 								col = col + 1;
 							} else {
-								_log('Trided to write character ' + character + ' which is not supported.');
+								_log('Tried to write character ' + character + ' which is not supported.');
 							}
 							break;
 					}
