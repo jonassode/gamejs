@@ -631,7 +631,7 @@ function _textbox_class(attributes) {
 	this.x = (attributes.x || 0);
 	this.y = (attributes.y || 0);
 	this.text = (attributes.text || "");
-	this.width = (attributes.width || 0);
+	this.width = (attributes.width || this.text.length || 1);
 	this.color = (attributes.color || '#000');
 	this.height = (attributes.height || 1);
 
