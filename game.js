@@ -633,7 +633,7 @@ function _textbox_class(attributes) {
 	this.text = (attributes.text || "");
 	this.width = (attributes.width || 0);
 	this.color = (attributes.color || '#000');
-	this.height = (attributes.height || 0);
+	this.height = (attributes.height || 1);
 
 	this.draw = function() {
 		var x = this.x + this.layer.screen.offsetx;
