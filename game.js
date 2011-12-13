@@ -695,7 +695,7 @@ function _textbox_class(attributes) {
 
 			var temp_text = this.text.replace(/\n/g," \n ");
 			var words = temp_text.toString().split(/[ ]/);
-
+_log(words);
 			for(var wi = 0; wi < words.length; wi++) {
 				word = words[wi];
 
@@ -732,6 +732,7 @@ function _textbox_class(attributes) {
 							img = GAMEJS.Alpha.letters[character];
 							if(img != null) {
 								this.layer.screen.context.drawImage(img, imgx, imgy);
+								//Move To Next Letter
 								col = col + 1;
 							} else {
 								_log('Tried to write character ' + character + ' which is not supported.');
@@ -739,7 +740,11 @@ function _textbox_class(attributes) {
 							break;
 					}
 				}
-				col = col + 1;
+				// Move A Space Between Each Words
+				// But don't do this on the first column, because this is after a line break
+				if ( col != 0 ) {
+					col = col + 1;
+				}
 			}
 		}
 	}
