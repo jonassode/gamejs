@@ -661,6 +661,8 @@ function _textbox_class(attributes) {
 	this.rows = (attributes.rows || 1);
 	this.width = null;
 	this.height = null;
+	this.bordersize = (attributes.bordersize || 0);
+	this.bordercolor = (attributes.bordercolor || '#FFF');
 
 	this.draw = function() {
 		var x = this.x + this.layer.screen.offsetx;
@@ -675,13 +677,21 @@ function _textbox_class(attributes) {
 		this.width = (this.cols * GAMEJS.Alpha.letter_width) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
 		this.height = (this.rows * GAMEJS.Alpha.letter_height) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
 
-		this.layer.screen.context.fillStyle = this.color;
-		this.layer.screen.context.fillRect(x, y, this.width, this.height);
+		if ( this.bordersize > 0 ){
+			this.layer.screen.context.fillStyle = this.bordercolor;
+			this.layer.screen.context.fillRect(x, y, this.width, this.height);
+			this.layer.screen.context.fillStyle = this.color;
+			this.layer.screen.context.fillRect(x+this.bordersize, y+this.bordersize, this.width-(this.bordersize*2), this.height-(this.bordersize*2));
+		} else {
+			this.layer.screen.context.fillStyle = this.color;
+			this.layer.screen.context.fillRect(x, y, this.width, this.height);
+		}
 
 		if(this.text != null && this.text != undefined) {
 
-			var temp_text = this.text.replace(/\n/g," \n");
+			var temp_text = this.text.replace(/\n/g," \n ");
 			var words = temp_text.toString().split(/[ ]/);
+
 			for(var wi = 0; wi < words.length; wi++) {
 				word = words[wi];
 
