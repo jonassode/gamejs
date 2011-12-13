@@ -642,6 +642,10 @@ function _lable_class(attributes) {
 
 function _button_class(attributes) {
 	var button = new _textbox_class(attributes);
+	button.bordersize = (attributes.bordersize || 1);
+	button.padding = (attributes.padding || 5);
+	button.color = (attributes.color || '#444');
+
 	
 	button.onclick = function(onclick_function) {
 		this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
