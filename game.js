@@ -695,7 +695,7 @@ function _textbox_class(attributes) {
 
 			var temp_text = this.text.replace(/\n/g," \n ");
 			var words = temp_text.toString().split(/[ ]/);
-_log(words);
+
 			for(var wi = 0; wi < words.length; wi++) {
 				word = words[wi];
 
