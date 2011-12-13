@@ -44,7 +44,9 @@ window.onload = function() {
 		cols : 67,
 		rows : 5,
 		padding : 8,
-		text : "Instructions:\nWalk with W,A,S,D. Use space to investigate."
+		text : "Instructions:\nWalk with W,A,S,D. Use space to investigate.",
+		bordersize : 3,
+		bordercolor : '#CCC',
 	});
 
 	// Create Statbox
@@ -54,7 +56,8 @@ window.onload = function() {
 		cols : 17,
 		rows : 40,
 		padding : 8,
-		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp} - {Index.player.nextlevel}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!"
+		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp} - {Index.player.nextlevel}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!",
+		bordersize : 3,
 	});
 	Index.stats = sb;
 
