@@ -580,7 +580,7 @@ function _log(msg) {
 function _screen_class(canvas_name, attributes) {
 	// Attributes
 	this.id = _generate_id("s");
-	this.name = "Screen";
+	this.name = (attributes.name || "Screen");
 	this.layers = new Array();
 	this.canvas = document.getElementById(canvas_name);
 	this.context = this.canvas.getContext("2d");
@@ -589,6 +589,8 @@ function _screen_class(canvas_name, attributes) {
 
 	this.offsetx = (attributes.offsetx || 0);
 	this.offsety = (attributes.offsety || 0);
+	this.width = (attributes.width || this.canvas.width);
+	this.height = (attributes.height || this.canvas.height);
 
 	// Add screen to Object Hash
 	_id_hash[this.id] = this
@@ -605,7 +607,7 @@ function _screen_class(canvas_name, attributes) {
 	// Draws all the visible layers of the screen
 	// Returns self-reference
 	this.draw = function() {
-		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.context.clearRect(this.offsetx, this.offsety, this.width, this.height);
 		for(var li = 0; li < this.layers.length; li++) {
 			if(this.layers[li].visible == true) {
 				this.layers[li].draw();
@@ -1041,12 +1043,14 @@ function _load(screen) {
 
 		var x = Math.floor((e.pageX - $("#" + canvas_name).offset().left));
 		var y = Math.floor((e.pageY - $("#" + canvas_name).offset().top));
-
+		
 		if(_visible_screen != null && _visible_screen != undefined) {
 
 			for(var coi = 0; coi < _visible_screen.clickable_objects.length; coi++) {
 				var object = _visible_screen.clickable_objects[coi];
-				if(object.x <= x && (object.x + object.width) >= x && object.y <= y && (object.y + object.height) >= y) {
+				var obj_x = (_visible_screen.offsetx + object.x);
+				var obj_y = (_visible_screen.offsety + object.y);
+				if(obj_x <= x && (obj_x + object.width) >= x && obj_y <= y && (obj_y + object.height) >= y) {
 					object.onclick_event();
 				}
 			}
