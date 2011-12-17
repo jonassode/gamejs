@@ -863,6 +863,7 @@ function _tilemap_class(attributes) {
 		tile.layer = this.layer;
 		tile.row = row;
 		tile.col = col;
+		tile.tilemap = this;
 		this.tiles[row][col] = tile;
 		return tile;
 	}
