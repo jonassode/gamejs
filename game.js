@@ -583,6 +583,7 @@ function _screen_class(canvas_name, attributes) {
 	this.name = (attributes.name || "Screen");
 	this.layers = new Array();
 	this.canvas = document.getElementById(canvas_name);
+	this.canvas_name = canvas_name;
 	this.context = this.canvas.getContext("2d");
 	this.keypresses = {};
 	this.clickable_objects = new Array();
