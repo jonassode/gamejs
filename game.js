@@ -874,6 +874,7 @@ function _tilemap_class(attributes) {
 		var tile = jQuery.extend(true, {}, original_tile);
 		tile.layer = this.layer;
 		tile.id = _generate_id("n");
+		// Why are we doing this?
 		original_tile.row = row;
 		original_tile.col = col;
 		tile.row = row;
@@ -951,18 +952,19 @@ function _tilemap_class(attributes) {
 	this.draw = function() {
 		for(var row = this.row; row < (this.visiblerows + this.row); row++) {
 			for(var col = this.col; col < (this.visiblecols + this.col); col++) {
+
+				this.backgrounds[row][col].x = ((col - this.col) * this.tilesize) + this.x;
+				this.backgrounds[row][col].y = ((row - this.row) * this.tilesize) + this.y;
+				this.backgrounds[row][col].width = this.tilesize;
+				this.backgrounds[row][col].height = this.tilesize;
+				this.backgrounds[row][col].draw();
+
 				if(this.tiles[row][col] != null) {
 					this.tiles[row][col].x = ((col - this.col) * this.tilesize) + this.x;
 					this.tiles[row][col].y = ((row - this.row) * this.tilesize) + this.y;
 					this.tiles[row][col].width = this.tilesize;
 					this.tiles[row][col].height = this.tilesize;
 					this.tiles[row][col].draw();
-				} else if(this.backgrounds[row][col] != null) {
-					this.backgrounds[row][col].x = ((col - this.col) * this.tilesize) + this.x;
-					this.backgrounds[row][col].y = ((row - this.row) * this.tilesize) + this.y;
-					this.backgrounds[row][col].width = this.tilesize;
-					this.backgrounds[row][col].height = this.tilesize;
-					this.backgrounds[row][col].draw();
 				}
 			}
 		}
