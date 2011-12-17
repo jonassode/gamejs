@@ -555,6 +555,7 @@ function _node_class(attributes) {
 		this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
 		// Register function for this tiles onlick event
 		this.onclick_event = onclick_function;
+		return this;
 	}
 	// Updates the Image of the Node
 	//  src: Path to image or null if you want to remove the image
