@@ -4,13 +4,18 @@ var Director = new _director_class();
 // Namespace
 var Index = {
 	screen : null,
-	menu_screen : null
+	menu_screen : null,
+	enemies : null,
+	temporary_tiles : null
 };
 
 // Init
 window.onload = function() {
 	// Create screen
 	Index.screen = _screen("game", {});
+
+	// Create Array
+	Index.temporary_tiles = new Array();
 
 	// Create Layers and Objects
 	var lb = Index.screen.layer("background");
@@ -56,12 +61,14 @@ window.onload = function() {
 		cols : 17,
 		rows : 40,
 		padding : 8,
-		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp} - {Index.player.nextlevel}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\n\nEquiptment:\nNone!",
+		text : "LORD ZEDRIK\n-----------\nLevel: {Index.player.level}\nXp: {Index.player.xp} - {Index.player.nextlevel}\n\nAttack: {Index.player.attack}\nDefense: {Index.player.defense}\n\nHp: {Index.player.hp}\nFood: {Index.player.food}\nWater: {Index.player.water}\nWood: {Index.player.wood}\nMp: {Index.player.mp}",
 		bordersize : 3,
 	});
 	Index.stats = sb;
 
-	lb.button({x: 498, y: 440, text: "Inventory" }).onclick(function() { say('a');});
+	lb.button({x: 571, y: 426, text: "Spells" }).onclick(function() { say('You have no spells.');});
+	lb.button({x: 498, y: 426, text: "Inventory" }).onclick(function() { say('You have nothing.');});
+	lb.button({x: 498, y: 446, text: "Instructions" }).onclick(function() { say("Walk with W,A,S,D.\nSpace to investigate.\nm to show map.\nc to conjure familiar to fight by your side.");});
 
 	// Register movements
 	Index.screen.keypress('w', function() {
@@ -76,6 +83,28 @@ window.onload = function() {
 	Index.screen.keypress('d', function() {
 		move(_right);
 	});
+	Index.screen.keypress('m', function() {
+		say("Soon you will be able to view the map. But not today.");
+	});
+	Index.screen.keypress('c', function() {
+		if ( Index.player.mp >= 30 ){
+			var tile = Index.player;
+			for(var ii=0;ii<tile.interfaces.length;ii++){
+				var a = tile.interfaces[ii].background();
+
+				if ( a != null ){
+					if ( tile.tilemap.get_tile(a.row, a.col) == null && a.walkable != false ) {
+						tile.tilemap.place_tile(a.row,a.col, NODES.familiar_placer).onclick(function(){this.click()});
+						temp_tile = tile.tilemap.get_tile(a.row, a.col);
+						Index.temporary_tiles[Index.temporary_tiles.length] = temp_tile;
+					}
+				}
+			}
+			tile.tilemap.draw();
+		} else {
+			say('You dont have enough mp. Cost: 30');
+		}
+	});
 	Index.screen.keypress(' ', function() {
 		tm.background(player.row,player.col).space(Index.player);
 		Director.end_turn();
@@ -89,14 +118,26 @@ window.onload = function() {
 	Preload('cave_stairs.gif');
 	Preload('cave_wall.gif');
 	Preload('ground_0.gif');
+	Preload('ground_1.gif');
+	Preload('ground_2.gif');
+	Preload('ground_3.gif');
+	Preload('ground_4.gif');
+	Preload('ground_5.gif');
+	Preload('ground_6.gif');
+	Preload('ground_7.gif');
+	Preload('ground_8.gif');
 	Preload('man.gif');
 	Preload('town.gif');
+	Preload('heart.gif');
+	Preload('heart_empty.gif');
 	Preload('tree.gif');
 	Preload('tree_chopped.gif');
 	Preload('tree_empty.gif');
 	Preload('water.gif');
 	Preload('zombie.gif');
 	Preload('bg.png');
+	Preload('familiar.gif');
+	Preload('familiar_placer.gif');
 
 	_load(Index.screen);
 	Director.start_game();
@@ -196,6 +237,8 @@ function make_map(tm, player) {
 	var water = NODES.water;
 	var stairs = NODES.stairs;
 	var zombie = NODES.zombie;
+	var familiar = NODES.familiar;
+	var familiar_placer = NODES.familiar_placer;
 
 	// Draw Ground
 	for(var i = 0; i < tm.cols; i++) {
@@ -217,12 +260,14 @@ function make_map(tm, player) {
 
 	// Place 40 random tiles
 	for(var i = 0; i < 40; i++) {
-
 		tm.place(random_row(tm), random_col(tm), tree);
-		tm.place(random_row(tm), random_col(tm), water);
 		tm.place(random_row(tm), random_col(tm), wall);
-
 	}
+
+	for(var i = 0; i < 15; i++) {
+		tm.place(random_row(tm), random_col(tm), water);
+	}
+
 
 	// 10 random hearts
 	for(var i = 0; i < 10; i++) {
@@ -240,10 +285,7 @@ function make_map(tm, player) {
 		var c = random_col(tm);
 		if ( tm.background(r,c).walkable != false ) {
 			tm.place_tile(r, c, zombie);
-			var index = Index.enemies.length;
-			Index.enemies[index] = tm.get_tile(r, c);
-			tm.get_tile(r,c).index = index;
-			tm.get_tile(r,c).list = Index.enemies;
+			add_unit_to_list(tm.get_tile(r, c));
 		}
 	} 
 
@@ -262,11 +304,41 @@ function make_map(tm, player) {
 	tm.draw();
 }
 
+//
+function clear_temporary_tiles(){
+    var tile
+    var tilemap
+    for(var i=0;i<Index.temporary_tiles.length;i++){
+        tile = Index.temporary_tiles[i];
+	tilemap = tile.tilemap;
+        tile.tilemap.remove(tile.row, tile.col);
+    }
+    Index.temporary_tiles = new Array();
+    if ( tilemap != null ){     
+	tilemap.draw();
+	}
+}
+
+// Add a unit to the list
+// To make them move and die
+function add_unit_to_list(tile) {
+	var index = Index.enemies.length;
+	Index.enemies[index] = tile;
+	tile.index = index;
+	tile.list = Index.enemies;
+}
+
 function _end_of_turn() {
+	// Clear Temprary Tiles
+	clear_temporary_tiles();
+
 	// Decrease Food and Water
 	if ( Index.player.moved == true ) {
 		Index.player.food--;
 		Index.player.water--;
+		if ( Index.player.mp < Index.player.maxmp ) {
+			Index.player.mp++;
+		}
 	}
 	// Reset moved state
 	Index.player.moved = false;

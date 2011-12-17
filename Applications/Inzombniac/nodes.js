@@ -1,4 +1,22 @@
 
+var familiar_placer = _tile({
+	image : 'familiar_placer.gif',
+});
+
+familiar_placer.click = function() {
+	say('You have created a familiar!');
+	var col = this.col;
+	var row = this.row;
+	var tilemap = this.tilemap;
+
+	clear_temporary_tiles();
+	tilemap.place_tile(row, col, NODES.familiar);
+	add_unit_to_list(tilemap.get_tile(row, col));
+	Index.player.mp -= 30;
+	Index.stats.draw();
+	tilemap.draw();
+}
+
 
 var wall = _tile({
 	image : 'cave_wall.gif',
@@ -106,9 +124,55 @@ zombie.death = function(){
 	Index.tilemap.remove(this.row, this.col);
 }
 
+var familiar = _tile({
+	image:'familiar.gif',
+	walkable:false,
+});
+familiar.defense = 5;
+familiar.attack = 5;
+familiar.hp = 10;
+familiar.object = "hero";
+familiar.name = "Gray Bird";
+familiar.move = function(){
+	var direction = null;
+
+	switch(Math.floor(Math.random() * 4))
+	{
+	case 0:
+	  direction = _up;
+	  break;
+	case 1:
+	  direction = _down;
+	  break;
+	case 2:
+	  direction = _left;
+	  break;
+	case 3:
+	  direction = _right;
+	  break;
+	}
+
+	var pos = this.get_position_from_direction(direction);
+	var dest_bg = Index.tilemap.background(pos.row, pos.col);
+	var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
+
+	if ( dest_tile != null ) {
+		if ( dest_tile.object == "monster" ) {
+			fight(this, dest_tile);
+		}
+	} else if ( dest_bg.walkable != false ) {
+		Index.tilemap.move_tile(pos.row, pos.col, this);
+	}
+}
+familiar.death = function(){
+	Index.tilemap.remove(this.row, this.col);
+}
+
 var player = _tile({
 	image : 'man.gif'
 });
+player.mp = 20;
+player.maxmp = 40;
 player.maxhp = 20;
 player.hp = player.maxhp;
 player.food = 70;
@@ -135,6 +199,8 @@ NODES.tree = tree;
 NODES.water = water;
 NODES.stairs = stairs;
 NODES.zombie = zombie;
+NODES.familiar = familiar;
+NODES.familiar_placer = familiar_placer;
 NODES.player = player;
 
 
