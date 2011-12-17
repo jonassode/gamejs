@@ -586,6 +586,7 @@ function _screen_class(canvas_name, attributes) {
 	this.context = this.canvas.getContext("2d");
 	this.keypresses = {};
 	this.clickable_objects = new Array();
+	this.previous_screen = null;
 
 	this.offsetx = (attributes.offsetx || 0);
 	this.offsety = (attributes.offsety || 0);
@@ -613,6 +614,7 @@ function _screen_class(canvas_name, attributes) {
 				this.layers[li].draw();
 			}
 		}
+		this.previous_screen = _visible_screen;
 		_visible_screen = this;
 		return this;
 	};
@@ -623,6 +625,11 @@ function _screen_class(canvas_name, attributes) {
 		this.keypresses[charUpperCase] = func;
 		return this;
 	};
+
+	this.close = function() {
+		_visible_screen = this.previous_screen;
+		_visible_screen.draw();
+	}
 }
 
 function _lable_class(attributes) {
