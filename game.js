@@ -567,6 +567,26 @@ function _node_class(attributes) {
 		}
 		return this;
 	}
+
+	this.distance_to = function(tile) {
+		distance = 0;
+
+		if (this.row > tile.row){
+			distance = this.row - tile.row;
+		} else {
+			distance = tile.row - this.row;
+		
+		}
+
+		if (this.col > tile.col){
+			distance += this.col - tile.col;
+		} else {
+			distance = tile.col - this.col;
+		
+		}
+
+		return distance;
+	}
 }
 
 function _log(msg) {
