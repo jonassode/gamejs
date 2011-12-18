@@ -577,6 +577,29 @@ function _log(msg) {
 	//
 }
 
+function Dialog(attributes){
+	
+		var canvas = _visible_screen.canvas;
+		var width = 500;
+		var height = 300;
+
+		var map_screen = _screen(_visible_screen.canvas_name, {
+			offsetx: ((canvas.width/2)-(width/2)), 
+			offsety: ((canvas.height/2)-(height/2)),
+			width : width,
+			height : height,
+			name : "map",
+		});
+		var map_layer = map_screen.layer("background");
+		map_layer.node({
+			image : 'bg.png',
+			width: width,
+			height : height,
+		});
+		map_layer.button({x: width/2-30, y: height-25, text: "Close" }).onclick(function() { this.layer.screen.close();});
+		map_screen.draw();
+}
+
 function _screen_class(canvas_name, attributes) {
 	// Attributes
 	this.id = _generate_id("s");
