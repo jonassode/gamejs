@@ -1,4 +1,8 @@
 
+var tombstone = _tile({
+	image : 'tombstone.gif',
+});
+
 var familiar_placer = _tile({
 	image : 'familiar_placer.gif',
 });
@@ -187,7 +191,12 @@ player.wood = 0;
 player.name = "You, the Noble Lord Zedrik";
 player.object = "hero";
 player.death = function(){
-	Index.tilemap.remove(this.row, this.col);
+	var row = this.row;
+	var col = this.col;
+	
+	Index.tilemap.remove(row, col);
+	Index.tilemap.place_tile(row, col, NODES.tombstone);
+
 	player.status = "DEAD";
 }
 player.status = "ALIVE";
@@ -202,5 +211,6 @@ NODES.zombie = zombie;
 NODES.familiar = familiar;
 NODES.familiar_placer = familiar_placer;
 NODES.player = player;
+NODES.tombstone = tombstone;
 
 

@@ -66,10 +66,24 @@ window.onload = function() {
 	});
 	Index.stats = sb;
 
-	lb.button({x: 571, y: 426, text: "Spells" }).onclick(function() { say('You have no spells.');});
-	lb.button({x: 498, y: 426, text: "Inventory" }).onclick(function() { say('You have nothing.');});
-	lb.button({x: 498, y: 446, text: "Instructions" }).onclick(function() { say("Walk with W,A,S,D.\nSpace to investigate.\nm to show map.\nc to conjure familiar to fight by your side.");});
-
+	lb.button({
+		x : 571,
+		y : 426,
+		text : "Spells"
+	}).onclick(function() { say('You have no spells.');
+	});
+	lb.button({
+		x : 498,
+		y : 426,
+		text : "Inventory"
+	}).onclick(function() { say('You have nothing.');
+	});
+	lb.button({
+		x : 498,
+		y : 446,
+		text : "Instructions"
+	}).onclick(function() { say("Walk with W,A,S,D.\nSpace to investigate.\nm to show map.\nc to conjure familiar to fight by your side.");
+	});
 	// Register movements
 	Index.screen.keypress('w', function() {
 		move(_up);
@@ -84,17 +98,19 @@ window.onload = function() {
 		move(_right);
 	});
 	Index.screen.keypress('m', function() {
-		say("Soon you will be able to view the map. But not today.");
+		Dialog();
 	});
 	Index.screen.keypress('c', function() {
-		if ( Index.player.mp >= 30 ){
+		if(Index.player.mp >= 30) {
 			var tile = Index.player;
-			for(var ii=0;ii<tile.interfaces.length;ii++){
+			for(var ii = 0; ii < tile.interfaces.length; ii++) {
 				var a = tile.interfaces[ii].background();
 
-				if ( a != null ){
-					if ( tile.tilemap.get_tile(a.row, a.col) == null && a.walkable != false ) {
-						tile.tilemap.place_tile(a.row,a.col, NODES.familiar_placer).onclick(function(){this.click()});
+				if(a != null) {
+					if(tile.tilemap.get_tile(a.row, a.col) == null && a.walkable != false) {
+						tile.tilemap.place_tile(a.row, a.col, NODES.familiar_placer).onclick(function() {
+							this.click()
+						});
 						temp_tile = tile.tilemap.get_tile(a.row, a.col);
 						Index.temporary_tiles[Index.temporary_tiles.length] = temp_tile;
 					}
@@ -106,8 +122,11 @@ window.onload = function() {
 		}
 	});
 	Index.screen.keypress(' ', function() {
-		tm.background(player.row,player.col).space(Index.player);
-		Director.end_turn();
+		if(player.status == "ALIVE") {
+			tm.background(player.row, player.col).space(Index.player);
+			Director.end_turn();
+		}
+
 	});
 
 	Index.tilemap = tm;
@@ -138,31 +157,32 @@ window.onload = function() {
 	Preload('bg.png');
 	Preload('familiar.gif');
 	Preload('familiar_placer.gif');
+	Preload('tombstone.gif');
 
 	_load(Index.screen);
 	Director.start_game();
 
 };
-
-function fight(actor, monster){
+function fight(actor, monster) {
 	var attack = Math.floor(Math.random() * actor.attack + 3);
 	monster.hp = monster.hp - attack;
 
 	say_again(actor.name + " attack " + monster.name + " and do " + attack + " damage.");
-	if ( monster.hp > 0 ) {			
+	if(monster.hp > 0) {
 		say_again("Hp left " + monster.hp);
 	} else {
 		say_again(monster.name + " died");
-		if ( monster.list != null){
+		if(monster.list != null) {
 			monster.list[monster.index] = null;
 		}
+		monster.hp = 0;
 		monster.death();
 		var gained_xp = Math.floor(Math.random() * 15 + 10)
 		actor.xp = actor.xp + gained_xp;
 		say_again(actor.name + " gained " + gained_xp + " xp.");
-		if ( actor.xp > actor.nextlevel ) {
-			gain_level(actor);	
-		}		
+		if(actor.xp > actor.nextlevel) {
+			gain_level(actor);
+		}
 	}
 
 }
@@ -172,29 +192,28 @@ function gain_level(actor) {
 	actor.xp = 0;
 	actor.nextlevel = actor.nextlevel + Math.floor(actor.nextlevel * 0.2);
 	actor.maxhp = actor.maxhp + Math.floor(actor.maxhp * 0.2);
-	actor.attack = actor.attack + Math.floor( actor.attack * 0.2);
-	actor.defense = actor.defense + Math.floor( actor.defense * 0.2);
+	actor.attack = actor.attack + Math.floor(actor.attack * 0.2);
+	actor.defense = actor.defense + Math.floor(actor.defense * 0.2);
 	actor.hp = actor.maxhp;
 
 	say_again(actor.name + " gained a Level!");
 }
 
-function move(direction){
-	if ( player.status == "ALIVE" ) {
+function move(direction) {
+	if(player.status == "ALIVE") {
 		Index.textbox.text = "";
 		var pos = Index.player.get_position_from_direction(direction);
 		var dest_bg = Index.tilemap.background(pos.row, pos.col);
 		var dest_tile = Index.tilemap.get_tile(pos.row, pos.col);
 
-
-		if ( dest_tile != null ) {
-			if ( dest_tile.object == "monster" ) {
+		if(dest_tile != null) {
+			if(dest_tile.object == "monster") {
 				fight(Index.player, dest_tile);
 				Index.player.moved = true;
 				Director.end_turn();
 			}
 
-		} else if ( dest_bg.walkable != false ) {
+		} else if(dest_bg.walkable != false) {
 			Index.player.move(direction);
 			Index.player.moved = true;
 			Director.end_turn();
@@ -208,14 +227,13 @@ function say(text) {
 }
 
 function say_again(text) {
-	if ( Index.textbox.text != ""){
+	if(Index.textbox.text != "") {
 		Index.textbox.text = Index.textbox.text + "\n" + text;
 	} else {
 		Index.textbox.text = text;
 	}
 	Index.textbox.draw();
 }
-
 
 function random_row(tm) {
 	return (Math.floor(Math.random() * (tm.rows - 6))) + 3;
@@ -244,7 +262,8 @@ function make_map(tm, player) {
 	for(var i = 0; i < tm.cols; i++) {
 		for(var j = 1; j < tm.rows; j++) {
 			tm.background(j, i).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif');
-			tm.background(j, i).space = function() { say('Nothing of interest here'); }
+			tm.background(j, i).space = function() { say('Nothing of interest here');
+			}
 		}
 	}
 
@@ -268,7 +287,6 @@ function make_map(tm, player) {
 		tm.place(random_row(tm), random_col(tm), water);
 	}
 
-
 	// 10 random hearts
 	for(var i = 0; i < 10; i++) {
 
@@ -283,19 +301,19 @@ function make_map(tm, player) {
 	for(var i = 0; i < 20; i++) {
 		var r = random_row(tm);
 		var c = random_col(tm);
-		if ( tm.background(r,c).walkable != false ) {
+		if(tm.background(r, c).walkable != false) {
 			tm.place_tile(r, c, zombie);
 			add_unit_to_list(tm.get_tile(r, c));
 		}
-	} 
+	}
 
 	// Place player on start position,
-	tm.background(3, 3).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif' ).text = "";
+	tm.background(3, 3).set_image('ground_' + Math.floor(Math.random() * 9) + '.gif').text = "";
 	tm.background(3, 3).walkable = true;
-	tm.background(3, 3).space = function() { say('Nothing of interest here'); }
-	tm.put_tile(3, 3, player).onclick(function() {say('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name for such a wonderful man.')	
+	tm.background(3, 3).space = function() { say('Nothing of interest here');
+	}
+	tm.put_tile(3, 3, player).onclick(function() {say('This is You! Lord Zedrik of the old clan Borg. Zedrik Borg. What a wonderful name for such a wonderful man.')
 	});
-
 	// Place stairs on ending position,
 	Index.end = tm.place(tm.rows - 3, tm.cols - 3, stairs);
 
@@ -305,17 +323,17 @@ function make_map(tm, player) {
 }
 
 //
-function clear_temporary_tiles(){
-    var tile
-    var tilemap
-    for(var i=0;i<Index.temporary_tiles.length;i++){
-        tile = Index.temporary_tiles[i];
-	tilemap = tile.tilemap;
-        tile.tilemap.remove(tile.row, tile.col);
-    }
-    Index.temporary_tiles = new Array();
-    if ( tilemap != null ){     
-	tilemap.draw();
+function clear_temporary_tiles() {
+	var tile
+	var tilemap
+	for(var i = 0; i < Index.temporary_tiles.length; i++) {
+		tile = Index.temporary_tiles[i];
+		tilemap = tile.tilemap;
+		tile.tilemap.remove(tile.row, tile.col);
+	}
+	Index.temporary_tiles = new Array();
+	if(tilemap != null) {
+		tilemap.draw();
 	}
 }
 
@@ -329,27 +347,27 @@ function add_unit_to_list(tile) {
 }
 
 function _end_of_turn() {
+
 	// Clear Temprary Tiles
 	clear_temporary_tiles();
 
 	// Decrease Food and Water
-	if ( Index.player.moved == true ) {
+	if(Index.player.moved == true) {
 		Index.player.food--;
 		Index.player.water--;
-		if ( Index.player.mp < Index.player.maxmp ) {
+		if(Index.player.mp < Index.player.maxmp) {
 			Index.player.mp++;
 		}
 	}
 	// Reset moved state
 	Index.player.moved = false;
 
-
 	// Warning if low on food
-	if(Index.player.food <= 10){
+	if(Index.player.food <= 10) {
 		say('You are running low on food. You need to eat very soon.');
 	}
 	// Water Warning
-	if( Index.player.water <= 10) {
+	if(Index.player.water <= 10) {
 		say('You are running low on water. You need to drink very soon.');
 	}
 
@@ -365,15 +383,16 @@ function _end_of_turn() {
 	}
 
 	//
-	for(var i=0; i < Index.enemies.length;i++){
-		if ( Index.enemies[i] != null){
-			Index.enemies[i].move();	
+	for(var i = 0; i < Index.enemies.length; i++) {
+		if(Index.enemies[i] != null) {
+			Index.enemies[i].move();
 		}
 	}
 
-	// Redraw stuff 
+	// Redraw stuff
 	Index.stats.draw();
 	Index.tilemap.draw();
+
 }
 
 // Override Methods
