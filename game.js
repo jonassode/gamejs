@@ -573,33 +573,87 @@ function _log(msg) {
 	//
 }
 
-function Dialog(attributes) {
+// ENUM VALUES FOR DIALOGS
+// TEXT Displays Text and a OK button to close the frame
+// input : should be a string
+GAMEJS.TEXT = 1;
+// ASK Displays Text and
+GAMEJS.ASK = 2;
+GAMEJS.DISPLAY = 3;
+GAMEJS.CUSTOM = 4;
 
-	var canvas = _visible_screen.canvas;
-	var width = 500;
-	var height = 300;
+function _dialog_class(attributes) {
+	this.width = (attributes.width || 500);
+	this.height = (attributes.height || 300);
+	this.canvas = (attributes.canvas || _visible_screen.canvas);
+	this.screen_name = (attributes.screen_name || "dialog");
 
-	var map_screen = _screen(_visible_screen.canvas_name, {
-		offsetx : ((canvas.width / 2) - (width / 2)),
-		offsety : ((canvas.height / 2) - (height / 2)),
-		width : width,
-		height : height,
-		name : "map",
+	this.screen = _screen(_visible_screen.canvas_name, {
+		offsetx : ((this.canvas.width / 2) - (this.width / 2)),
+		offsety : ((this.canvas.height / 2) - (this.height / 2)),
+		width : this.width,
+		height : this.height,
+		name : this.screen_name,
 	});
-	var map_layer = map_screen.layer("background");
-	map_layer.node({
+
+	// Create Default Layer
+	// This can be overrided with function 'override_layer'
+	this.layer = this.screen.layer("background");
+	this.layer.node({
 		image : 'bg.png',
 		width : width,
 		height : height,
 	});
-	map_layer.button({
-		x : width / 2 - 30,
-		y : height - 25,
-		text : "Close"
-	}).onclick(function() {
-		this.layer.screen.close();
-	});
-	map_screen.draw();
+
+	// Override Layer
+	this.override_layer = function(layer) {
+		this.default_layer = layer;
+	}
+
+	this.button = function(x, y, text, callback) {
+		this.layer.button({
+			x : x,
+			y : y,
+			text : text
+		}).onclick(callback);
+	}
+
+	this.center = function() {
+		return (this.width / 2);
+	}
+	return this;
+}
+
+function Dialog(type, input, attributes) {
+
+	if(attributes == null) {
+		attributes = {};
+	}
+
+	// Create Dialog
+	var dialog = _dialog_class(attributes);
+
+	if(type == GAMEJS.TEXT) {
+		// Create Text
+		dialog.layer.textbox({
+			x : 10,
+			y : 10,
+			cols : (dialog.width - 30) / GAMEJS.Alpha.letter_width,
+			rows : (dialog.height - 50) / GAMEJS.Alpha.letter_height,
+			padding : 5,
+			bordersize : 1,
+			text : input
+		});
+
+		// Create Button
+		dialog.button(dialog.center() - 30, dialog.height - 25, "OK", function() {
+			this.layer.screen.close();
+		});
+	}
+
+	// Draw screen and return dialog
+	dialog.screen.draw();
+	return dialog;
 }
 
 function _screen_class(canvas_name, attributes) {
