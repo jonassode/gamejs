@@ -581,7 +581,7 @@ function _node_class(attributes) {
 		if (this.col > tile.col){
 			distance += this.col - tile.col;
 		} else {
-			distance = tile.col - this.col;
+			distance += tile.col - this.col;
 		
 		}
 
