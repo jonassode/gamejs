@@ -569,23 +569,71 @@ function _node_class(attributes) {
 	}
 
 	this.distance_to = function(tile) {
-		distance = 0;
+		var distance = 0;
 
-		if (this.row > tile.row){
+		if(this.row > tile.row) {
 			distance = this.row - tile.row;
 		} else {
 			distance = tile.row - this.row;
-		
+
 		}
 
-		if (this.col > tile.col){
+		if(this.col > tile.col) {
 			distance += this.col - tile.col;
 		} else {
 			distance += tile.col - this.col;
-		
+
+		}
+		return distance;
+	}
+
+	this.direction_to = function(tile) {
+		var direction = null;
+		var horizontal_distance = 0;
+		var horizontal_direction = null;
+		var vertical_distance = 0;
+		var vertical_direction = null;
+
+		if(this.row == tile.row) {
+			horizontal_distance = 0;
+			horizontal_direction = null;
+		} else if(this.row > tile.row) {
+			horizontal_distance = this.row - tile.row;
+			horizontal_direction = _up;
+		} else {
+			horizontal_distance = tile.row - this.row;
+			horizontal_direction = _down;
 		}
 
-		return distance;
+		if(this.col == tile.col) {
+			vertical_distance = 0;
+			vertical_direction = null;
+		} else if(this.col > tile.col) {
+			vertical_distance = this.col - tile.col;
+			vertical_direction = _left
+		} else {
+			vertical_distance = tile.col - this.col;
+			vertical_direction = _right
+		}
+
+		if(vertical_distance == horizontal_distance) {
+			// Should be random
+			switch(Math.floor(Math.random() * 2)) {
+				case 0:
+					direction = vertical_direction;
+					break;
+				case 1:
+					direction = horizontal_direction;
+					break;
+			}
+
+		} else if(vertical_distance > horizontal_distance) {
+			direction = vertical_direction;
+		} else {
+			direction = horizontal_direction;
+		}
+
+		return direction;
 	}
 }
 
