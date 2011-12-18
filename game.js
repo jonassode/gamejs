@@ -391,7 +391,6 @@ function _layer_class(layer_name) {
 		this.lables[this.lables.length] = l;
 		return l;
 	};
-
 	// Create a textbox
 	this.textbox = function(attributes) {
 		var tb = new _textbox_class(attributes);
@@ -399,7 +398,6 @@ function _layer_class(layer_name) {
 		this.textboxes[this.textboxes.length] = tb;
 		return tb;
 	};
-
 	// Create a button
 	this.button = function(attributes) {
 		var button = new _button_class(attributes);
@@ -407,7 +405,6 @@ function _layer_class(layer_name) {
 		this.buttons[this.buttons.length] = button;
 		return button;
 	};
-
 	// Create a tilemap
 	this.tilemap = function(attributes) {
 		var tm = new _tilemap_class(attributes);
@@ -420,7 +417,7 @@ function _layer_class(layer_name) {
 }
 
 // Position Class
-function _position(row, col){
+function _position(row, col) {
 	this.row = row;
 	this.col = col;
 }
@@ -493,16 +490,15 @@ function _node_class(attributes) {
 		this[attribute] = value;
 	}
 
-	this.get_position_from_direction = function(direction){
+	this.get_position_from_direction = function(direction) {
 		var y = this.row;
 		var x = this.col;
 		// Calculate New Direction
 		var newrow = y + direction.row;
 		var newcol = x + direction.col;
 
-		return new _position(newrow, newcol); 
+		return new _position(newrow, newcol);
 	}
-
 	// Movement
 	this.move = function(direction) {
 		if(this.type == 'tile') {
@@ -514,7 +510,7 @@ function _node_class(attributes) {
 
 			var pos = this.get_position_from_direction(direction);
 
-			if(!(pos.row < 0) && !(pos.col < 0) && !(pos.row >= this.tilemap.rows) && !(pos.col >= this.tilemap.cols) ) {
+			if(!(pos.row < 0) && !(pos.col < 0) && !(pos.row >= this.tilemap.rows) && !(pos.col >= this.tilemap.cols)) {
 
 				this.tilemap.move_tile(pos.row, pos.col, this);
 
@@ -577,27 +573,33 @@ function _log(msg) {
 	//
 }
 
-function Dialog(attributes){
-	
-		var canvas = _visible_screen.canvas;
-		var width = 500;
-		var height = 300;
+function Dialog(attributes) {
 
-		var map_screen = _screen(_visible_screen.canvas_name, {
-			offsetx: ((canvas.width/2)-(width/2)), 
-			offsety: ((canvas.height/2)-(height/2)),
-			width : width,
-			height : height,
-			name : "map",
-		});
-		var map_layer = map_screen.layer("background");
-		map_layer.node({
-			image : 'bg.png',
-			width: width,
-			height : height,
-		});
-		map_layer.button({x: width/2-30, y: height-25, text: "Close" }).onclick(function() { this.layer.screen.close();});
-		map_screen.draw();
+	var canvas = _visible_screen.canvas;
+	var width = 500;
+	var height = 300;
+
+	var map_screen = _screen(_visible_screen.canvas_name, {
+		offsetx : ((canvas.width / 2) - (width / 2)),
+		offsety : ((canvas.height / 2) - (height / 2)),
+		width : width,
+		height : height,
+		name : "map",
+	});
+	var map_layer = map_screen.layer("background");
+	map_layer.node({
+		image : 'bg.png',
+		width : width,
+		height : height,
+	});
+	map_layer.button({
+		x : width / 2 - 30,
+		y : height - 25,
+		text : "Close"
+	}).onclick(function() {
+		this.layer.screen.close();
+	});
+	map_screen.draw();
 }
 
 function _screen_class(canvas_name, attributes) {
@@ -680,7 +682,6 @@ function _button_class(attributes) {
 	button.padding = (attributes.padding || 5);
 	button.color = (attributes.color || '#444');
 
-	
 	button.onclick = function(onclick_function) {
 		this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
 		// Register function for this tiles onlick event
@@ -715,11 +716,11 @@ function _textbox_class(attributes) {
 		this.width = (this.cols * GAMEJS.Alpha.letter_width) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
 		this.height = (this.rows * GAMEJS.Alpha.letter_height) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
 
-		if ( this.bordersize > 0 ){
+		if(this.bordersize > 0) {
 			this.layer.screen.context.fillStyle = this.bordercolor;
 			this.layer.screen.context.fillRect(x, y, this.width, this.height);
 			this.layer.screen.context.fillStyle = this.color;
-			this.layer.screen.context.fillRect(x+this.bordersize, y+this.bordersize, this.width-(this.bordersize*2), this.height-(this.bordersize*2));
+			this.layer.screen.context.fillRect(x + this.bordersize, y + this.bordersize, this.width - (this.bordersize * 2), this.height - (this.bordersize * 2));
 		} else {
 			this.layer.screen.context.fillStyle = this.color;
 			this.layer.screen.context.fillRect(x, y, this.width, this.height);
@@ -727,7 +728,7 @@ function _textbox_class(attributes) {
 
 		if(this.text != null && this.text != undefined) {
 
-			var temp_text = this.text.replace(/\n/g," \n ");
+			var temp_text = this.text.replace(/\n/g, " \n ");
 			var words = temp_text.toString().split(/[ ]/);
 
 			for(var wi = 0; wi < words.length; wi++) {
@@ -776,7 +777,7 @@ function _textbox_class(attributes) {
 				}
 				// Move A Space Between Each Words
 				// But don't do this on the first column, because this is after a line break
-				if ( col != 0 ) {
+				if(col != 0) {
 					col = col + 1;
 				}
 			}
@@ -891,7 +892,6 @@ function _tilemap_class(attributes) {
 		this.tiles[row][col] = tile;
 		return tile;
 	}
-
 	// Places a specified tile ( NOT A COPY OF IT ) on the tilemap
 	this.put_tile = function(row, col, tile) {
 		tile.layer = this.layer;
@@ -901,7 +901,6 @@ function _tilemap_class(attributes) {
 		this.tiles[row][col] = tile;
 		return tile;
 	}
-
 	// Places a copy of a specified tile on the tilemap
 	this.place_tile = function(row, col, original_tile) {
 		var tile = jQuery.extend(true, {}, original_tile);
@@ -1029,7 +1028,7 @@ function _screen(screen_name, attributes) {
 	return s;
 }
 
-function _tile(attributes){
+function _tile(attributes) {
 	var tile = new _node_class(attributes);
 	//tile.layer = this.layer;
 	tile.type = 'tile';
@@ -1074,7 +1073,7 @@ function _load(screen) {
 
 		var x = Math.floor((e.pageX - $("#" + canvas_name).offset().left));
 		var y = Math.floor((e.pageY - $("#" + canvas_name).offset().top));
-		
+
 		if(_visible_screen != null && _visible_screen != undefined) {
 
 			for(var coi = 0; coi < _visible_screen.clickable_objects.length; coi++) {
