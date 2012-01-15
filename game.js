@@ -30,7 +30,7 @@ var _first_screen = null;
  * @namespace GAMEJS.Alpha
  */
 GAMEJS.Alpha = {}
-GAMEJS.Alpha.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890-_'\"";
+GAMEJS.Alpha.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890-_'?\"";
 GAMEJS.Alpha.letters = {};
 GAMEJS.Alpha.letter_padding = 2;
 GAMEJS.Alpha.letter_width = 5 + GAMEJS.Alpha.letter_padding;
@@ -46,9 +46,19 @@ GAMEJS.Alpha.letter_height = 8 + GAMEJS.Alpha.letter_padding;
  * @function
  */
 GAMEJS.Alpha.load = function() {
+	var letter_image;
 	for(var counter = 0; counter < this.alphabet.length; counter++) {
+		switch(this.alphabet[counter])
+		{
+		case "?":
+		  letter_image = "_question_mark.gif";
+		  break;
+		default:
+		  letter_image = this.alphabet[counter] + ".gif";
+		}		
+		
 		this.letters[this.alphabet[counter]] = new Image();
-		this.letters[this.alphabet[counter]].src = GAMEJS.gamejs_folder + "Images/" + this.alphabet[counter] + ".gif";
+		this.letters[this.alphabet[counter]].src = GAMEJS.gamejs_folder + "Images/" + letter_image;
 		_images[_images.length] = this.letters[this.alphabet[counter]];
 	}
 }
