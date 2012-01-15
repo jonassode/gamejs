@@ -887,11 +887,22 @@ function _textbox_class(attributes) {
 				if(word[0] == "{") {
 					var parameter_name = "";
 					var temp_counter = 1;
-					while(word[temp_counter] != "}") {
+					while(word[temp_counter] != "}" && temp_counter < word.length) {
 						parameter_name = parameter_name + word[temp_counter];
 						temp_counter = temp_counter + 1;
 					}
-					word = word.replace("{" + parameter_name + "}", eval(parameter_name));
+					try {
+					  var evaluated_value = eval(parameter_name);
+					}
+					catch(err){
+					   _log(err);
+					}
+					if ( evaluated_value === undefined){
+						_log("Could not evaluate parameter" + word );
+						word = "";
+					} else {
+						word = "" + evaluated_value;
+					}
 				}
 
 				// Check if we want to move to next row
