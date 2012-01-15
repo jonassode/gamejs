@@ -808,6 +808,7 @@ function _button_class(attributes) {
 		this.layer.screen.clickable_objects[this.layer.screen.clickable_objects.length] = this;
 		// Register function for this tiles onlick event
 		this.onclick_event = onclick_function;
+		return this;
 	}
 	return button;
 }
@@ -820,10 +821,18 @@ function _textbox_class(attributes) {
 	this.cols = (attributes.cols || this.text.length || 1);
 	this.color = (attributes.color || '#000');
 	this.rows = (attributes.rows || 1);
-	this.width = null;
-	this.height = null;
+
+	this.width = (attributes.width || null);
+	this.height = (attributes.height || null);
 	this.bordersize = (attributes.bordersize || 0);
 	this.bordercolor = (attributes.bordercolor || '#FFF');
+	this.image = null;
+
+	// Load Image
+	if (attributes.image != null){
+		this.image = new Image();
+		this.image.src = attributes.image;
+	}
 
 	this.draw = function() {
 		var x = this.x + this.layer.screen.offsetx;
@@ -835,8 +844,8 @@ function _textbox_class(attributes) {
 		var character = null;
 		var img = null;
 		var word = null;
-		this.width = (this.cols * GAMEJS.Alpha.letter_width) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
-		this.height = (this.rows * GAMEJS.Alpha.letter_height) + (this.padding * 2) - GAMEJS.Alpha.letter_padding;
+		this.width = (this.width || ((this.cols * GAMEJS.Alpha.letter_width) + (this.padding * 2) - GAMEJS.Alpha.letter_padding));
+		this.height = (this.height || ((this.rows * GAMEJS.Alpha.letter_height) + (this.padding * 2) - GAMEJS.Alpha.letter_padding));
 
 		if(this.bordersize > 0) {
 			this.layer.screen.context.fillStyle = this.bordercolor;
@@ -846,6 +855,11 @@ function _textbox_class(attributes) {
 		} else {
 			this.layer.screen.context.fillStyle = this.color;
 			this.layer.screen.context.fillRect(x, y, this.width, this.height);
+		}
+		
+		// Draw background image
+		if (this.image != null){
+			this.layer.screen.context.drawImage(this.image, this.x + this.layer.screen.offsetx, this.y + this.layer.screen.offsety, this.width, this.height);
 		}
 
 		if(this.text != null && this.text != undefined) {
