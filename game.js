@@ -30,7 +30,7 @@ var _first_screen = null;
  * @namespace GAMEJS.Alpha
  */
 GAMEJS.Alpha = {}
-GAMEJS.Alpha.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890-_'?/[]\"";
+GAMEJS.Alpha.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ:!.,1234567890-_'?/[]()\"";
 GAMEJS.Alpha.letters = {};
 GAMEJS.Alpha.letter_padding = 2;
 GAMEJS.Alpha.letter_width = 5 + GAMEJS.Alpha.letter_padding;
