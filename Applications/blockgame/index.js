@@ -42,8 +42,8 @@ window.onload = function () {
     ltm.textbox({
         x:0, 
         y:0, 
-        width:47, 
-        height:4, 
+        cols:47, 
+        rows:4, 
         padding:2, 
         text:"Welcome To Blockgame.\nPlayer turn: {Director.current_player.name}\nRed have: {Director.player(\"Red\").blocks} blocks left.\nBlue have: {Director.player(\"Blue\").blocks} blocks left."
     });

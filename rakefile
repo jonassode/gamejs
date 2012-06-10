@@ -2,6 +2,7 @@
 
 # Imports 
 require 'fileutils'
+require 'rake/contrib/ftptools'
 
 desc "Runs Tests"
 task :test do
@@ -31,6 +32,15 @@ task :create_folder do
 	FileUtils.cp_r('Applications/' + ENV['game'], dir_ex)
 
 	puts dir_root
+end
+
+
+desc "Uploads the project to the server using ftp."
+task :upload_project do
+  Rake::FtpUploader.connect(ENV['path_on_server'], ENV['hostname'], ENV['user'], ENV['password']) do |ftp|
+    ftp.verbose = true
+    ftp.upload_files(ENV['project_path'] + "/**/*")
+  end
 end
 
 desc "Runs all common tasks"
